@@ -13,7 +13,7 @@
       href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@200..1000&display=swap"
       rel="stylesheet"
     />
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -847,6 +847,23 @@
 
     <!-- RSVP Attendance Success Modal -->
     <div
+      id="qr-modal"
+      class="fixed inset-0 hidden items-center justify-center bg-black/70 z-50"
+    >
+      <div class="bg-white rounded-2xl p-6 text-center">
+        <h2 class="text-2xl mb-4">بطاقة الحضور</h2>
+
+        <div id="guest-qr"></div>
+
+        <button
+          onclick="closeModal('qr-modal')"
+          class="mt-5 px-5 py-2 bg-blue-600 text-white rounded"
+        >
+          إغلاق
+        </button>
+      </div>
+    </div>
+    <div
       id="success-modal"
       class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-opacity duration-300"
     >
@@ -863,6 +880,7 @@
         <h3 class="font-ruqaa text-andalusia-gold text-2xl font-bold mt-2">
           تم تأكيد حضورك بنجاح!
         </h3>
+
         <p class="font-cairo text-andalusia-darkgold text-sm leading-relaxed">
           يسعدنا جداً ويشرفنا تلبية دعوتنا. ننتظر حضورك الكريم لنصنع معاً
           ذكرياتٍ لا تُنسى 💙
@@ -912,6 +930,7 @@
 
     <!-- MAIN JAVASCRIPT -->
     <script>
+      const invitationId = "INV-" + Date.now().toString(36).toUpperCase();
       let invitationOpened = false;
       let videoSkipped = false;
 
@@ -1328,8 +1347,8 @@
           }
 
           // Show elegant success modal
-          showModal("success-modal");
-
+          // showModal("success-modal");
+          showGuestQR(guestName, companionsVal);
           // Reset the RSVP form state
           form.reset();
           resetFormCounter();
@@ -1347,6 +1366,27 @@
                     <span>سأحضر</span>
                 `;
         }
+      }
+      function showGuestQR(name, companions) {
+        const qrDiv = document.getElementById("guest-qr");
+        qrDiv.innerHTML = "";
+
+        const invitationId =
+          "INV-" +
+          Date.now().toString(36).random().toString(36).slice(-6).toUpperCase();
+
+        new QRCode(qrDiv, {
+          text: JSON.stringify({
+            id: invitationId,
+            name: name,
+            companions: companions,
+            status: "Accepted",
+          }),
+          width: 220,
+          height: 220,
+        });
+
+        showModal("qr-modal");
       }
       async function submitApology() {
         const guestName = document.getElementById("guest-name").value.trim();
