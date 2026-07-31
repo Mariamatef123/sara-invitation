@@ -132,6 +132,31 @@
         pointer-events: none;
         z-index: 1;
       }
+      #video-container {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #000;
+        overflow: hidden;
+      }
+      /* Mobile & Tablet */
+      #cinematic-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Laptop/Desktop */
+
+      @media (min-width: 1024px) {
+        #cinematic-video {
+          object-fit: contain;
+          background: #000 url("WhatsApp Imagee 2026-07-30 at 6.27.04 PM.jpeg")
+            center center / cover no-repeat;
+        }
+      }
 
       /* Pulsing and float animation */
       @keyframes pulse-gold {
@@ -351,21 +376,28 @@
       <!-- Skip Button (تخطي) -->
       <button
         onclick="skipEnvelopeAnimation()"
-        class="absolute top-6 right-6 bg-black/40 hover:bg-black/60 text-white font-cairo px-5 py-2 rounded-full border border-white/20 transition-all text-sm z-50"
+        class="absolute top-6 left-6 z-50 px-5 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-sm font-cairo hover:bg-white/25 transition-all duration-300 hover:scale-105 active:scale-95"
       >
-        تخطي
+        ⏭ تخطي
       </button>
 
       <!-- Video container for cinematic opening -->
       <div
         id="video-container"
-        class="flex justify-center items-center bg-black"
+        class="fixed inset-0 flex items-center justify-center bg-black"
       >
+        <div
+          id="video-loader"
+          class="hidden absolute inset-0 flex items-center justify-center bg-black/80 text-white text-xl z-50"
+        >
+          Loading...
+        </div>
         <video
           id="cinematic-video"
-          class="max-w-full max-h-screen"
           autoplay
           playsinline
+          preload="auto"
+          class="max-w-full max-h-full"
         >
           <source src="Video-Project-103.mp4" type="video/mp4" />
         </video>
@@ -750,7 +782,7 @@
               <!-- Apologize Button -->
               <button
                 type="button"
-                onclick="showApologyModal()"
+                onclick="submitApology()"
                 class="w-full bg-white/20 hover:bg-white/35 border border-andalusia-gold/35 text-andalusia-darkgold font-cairo font-medium py-2.5 rounded-xl flex items-center justify-center gap-1 transition-all shadow-sm active:scale-98 text-xs cursor-pointer"
               >
                 <!-- Apologize Cross Icon -->
@@ -889,72 +921,119 @@
 
     <!-- MAIN JAVASCRIPT -->
     <script>
-      // Background Music Element
-      const bgMusic = document.getElementById("bg-music");
-
-      // Opening trigger function (Tapping to Open)
+      let invitationOpened = false;
+      let videoSkipped = false;
       function openInvitation() {
-        // Play background music (safely authorized by user action)
+        if (invitationOpened) return;
+        invitationOpened = true;
+
+        // Play music
+        const bgMusic = document.getElementById("bg-music");
         bgMusic.play().catch((err) => {
-          console.log("Audio autoplay failed or deferred:", err);
+          console.log("Audio:", err);
         });
 
-        // Fade out the cover screen
+        // Hide cover
         const cover = document.getElementById("cover-screen");
         cover.classList.add("opacity-0");
+
         setTimeout(() => {
           cover.classList.add("hidden");
         }, 1000);
 
-        // Display and fade in the envelope overlay screen
+        // Show video screen
         const envScreen = document.getElementById("envelope-screen");
         envScreen.classList.remove("hidden");
         envScreen.classList.add("flex");
 
-        // Play the cinematic video and handle the image transitions
+        const loader = document.getElementById("video-loader");
         const video = document.getElementById("cinematic-video");
+        function updateVideoFit() {
+          if (window.innerWidth >= 1024) {
+            // Laptop/Desktop
+            video.style.objectFit = "contain";
+          } else {
+            // Mobile/Tablet
+            video.style.objectFit = "cover";
+          }
+        }
 
-        if (video) {
-          video.currentTime = 0;
-          video.play().catch((err) => {
-            console.log("Video playback failed, transitioning directly:", err);
-            revealMainContent();
-          });
+        window.addEventListener("resize", updateVideoFit);
+        updateVideoFit();
+        if (!video) {
+          revealMainContent();
+          return;
+        }
 
-          // When the video ends, transition to the main content
-          video.onended = () => {
-            revealMainContent();
-          };
+        let finished = false;
 
-          // Backup timer to transition if video.onended fails to fire (e.g. browser oddities)
-          const backupTransitionTimeout = setTimeout(() => {
-            revealMainContent();
-          }, 9800);
+        function finish() {
+          if (finished || videoSkipped) return;
 
-          // Attach timeouts to window for cleanup if skipped
-          window.cinematicTimeouts = [backupTransitionTimeout];
-        } else {
+          finished = true;
+
+          clearTimeout(timeout);
+
+          video.pause();
+
           revealMainContent();
         }
-      }
 
+        // Reset video
+        video.pause();
+        video.currentTime = 0;
+        video.load();
+
+        loader.style.display = "flex";
+
+        video.oncanplay = () => {
+          if (videoSkipped) return;
+
+          loader.style.display = "none";
+
+          video.play().catch(() => {
+            finish();
+          });
+        };
+
+        video.onended = finish;
+
+        video.onerror = finish;
+
+        video.onwaiting = () => {
+          loader.style.display = "flex";
+        };
+
+        video.onplaying = () => {
+          loader.style.display = "none";
+        };
+
+        // Safety timeout
+        const timeout = setTimeout(() => {
+          console.log("Video timeout");
+          finish();
+        }, 15000);
+      }
       // Bypasses the envelope animation entirely (Skip button)
       function skipEnvelopeAnimation() {
-        // Clear any active timeouts from the video animation
-        if (window.cinematicTimeouts) {
-          window.cinematicTimeouts.forEach((t) => clearTimeout(t));
-        }
+        videoSkipped = true;
 
-        // Pause video if playing
         const video = document.getElementById("cinematic-video");
+
         if (video) {
           video.pause();
+          video.currentTime = 0;
+
+          // Remove all video events
+          video.onended = null;
+          video.onerror = null;
+          video.onwaiting = null;
+          video.onplaying = null;
+          video.oncanplay = null;
         }
 
-        bgMusic.play().catch((e) => console.log(e));
         revealMainContent();
       }
-
       // Fades out envelope screen and fades in main invitation details
       function revealMainContent() {
         // Clear timeouts just in case
@@ -1210,18 +1289,45 @@
         formData.append("message", messageBody);
 
         try {
-          // Submit form seamlessly using Web3Forms API
-          const response = await fetch("https://api.web3forms.com/submit", {
-            method: "POST",
-            body: formData,
-            headers: { Accept: "application/json" },
-          });
+          // First Web3Forms account
+          const formData1 = new FormData(form);
+          formData1.append("message", messageBody);
+          formData1.set("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
 
-          const data = await response.json();
-          console.log("Web3Forms API Response:", data);
+          // Second Web3Forms account
+          const formData2 = new FormData(form);
+          formData2.append("message", messageBody);
+          formData2.set("access_key", "70196fed-cfe6-49e8-ac4c-7b86e7c3eaec");
 
-          if (!response.ok || data.success === false) {
-            console.warn("Web3Forms fallback to mail client", data);
+          // Send to both accounts
+          const [response1, response2] = await Promise.all([
+            fetch("https://api.web3forms.com/submit", {
+              method: "POST",
+              body: formData1,
+              headers: {
+                Accept: "application/json",
+              },
+            }),
+            fetch("https://api.web3forms.com/submit", {
+              method: "POST",
+              body: formData2,
+              headers: {
+                Accept: "application/json",
+              },
+            }),
+          ]);
+
+          const data1 = await response1.json();
+          const data2 = await response2.json();
+
+          console.log("Account 1:", data1);
+          console.log("Account 2:", data2);
+
+          if (
+            (!response1.ok || data1.success === false) &&
+            (!response2.ok || data2.success === false)
+          ) {
+            console.warn("Both Web3Forms submissions failed.");
             fallbackToMailClient();
             return;
           }
@@ -1242,14 +1348,91 @@
           btnSubmit.disabled = false;
           btnSubmit.classList.remove("opacity-75", "cursor-not-allowed");
           btnSubmitText.innerHTML = `
-                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                    </svg>
+                  
                     <span>سأحضر</span>
                 `;
         }
       }
+      async function submitApology() {
+        const guestName = document.getElementById("guest-name").value.trim();
+        const companionsVal = document.getElementById("companions-input").value;
+        const form = document.getElementById("rsvp-form");
 
+        if (!guestName) {
+          alert("من فضلك أدخل اسمك أولاً.");
+          document.getElementById("guest-name").focus();
+          return;
+        }
+
+        const subject = "اعتذار عن حضور زفاف محمد وسارة";
+
+        const messageBody = `مرحباً محمد وسارة،
+
+للأسف لن أتمكن من حضور حفل الزفاف.
+
+الاسم: ${guestName}
+عدد المرافقين: ${companionsVal}
+
+أتمنى لكم حياة سعيدة مليئة بالحب والفرح.`;
+
+        function fallbackToMailClient() {
+          const mailtoUrl = `mailto:mariamatef353@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageBody)}`;
+          window.location.href = mailtoUrl;
+
+          showModal("apology-modal");
+          form.reset();
+          resetFormCounter();
+        }
+
+        try {
+          // First account
+          const formData1 = new FormData(form);
+          formData1.set("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
+          formData1.set("subject", subject);
+          formData1.append("message", messageBody);
+
+          // Second account
+          const formData2 = new FormData(form);
+          formData2.set("access_key", "70196fed-cfe6-49e8-ac4c-7b86e7c3eaec");
+          formData2.set("subject", subject);
+          formData2.append("message", messageBody);
+
+          const [response1, response2] = await Promise.all([
+            fetch("https://api.web3forms.com/submit", {
+              method: "POST",
+              body: formData1,
+              headers: {
+                Accept: "application/json",
+              },
+            }),
+            fetch("https://api.web3forms.com/submit", {
+              method: "POST",
+              body: formData2,
+              headers: {
+                Accept: "application/json",
+              },
+            }),
+          ]);
+
+          const data1 = await response1.json();
+          const data2 = await response2.json();
+
+          if (
+            (!response1.ok || data1.success === false) &&
+            (!response2.ok || data2.success === false)
+          ) {
+            fallbackToMailClient();
+            return;
+          }
+
+          showModal("apology-modal");
+          form.reset();
+          resetFormCounter();
+        } catch (err) {
+          console.error(err);
+          fallbackToMailClient();
+        }
+      }
       function resetFormCounter() {
         companions = 0;
         compDisplay.innerText = "0";
