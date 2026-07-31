@@ -388,13 +388,10 @@
         </div>
         <video
           id="cinematic-video"
-          autoplay
           playsinline
-          preload="auto"
+          preload="metadata"
           class="max-w-full max-h-full"
-        >
-          <source src="Video-Project-103.mp4" type="video/mp4" />
-        </video>
+        ></video>
       </div>
     </div>
 
@@ -917,15 +914,14 @@
     <script>
       let invitationOpened = false;
       let videoSkipped = false;
-      function openInvitation() {
+
+      async function openInvitation() {
         if (invitationOpened) return;
         invitationOpened = true;
 
-        // Play music
+        // Play background music
         const bgMusic = document.getElementById("bg-music");
-        bgMusic.play().catch((err) => {
-          console.log("Audio:", err);
-        });
+        bgMusic.play().catch(console.log);
 
         // Hide cover
         const cover = document.getElementById("cover-screen");
@@ -935,29 +931,26 @@
           cover.classList.add("hidden");
         }, 1000);
 
-        // Show video screen
+        // Show envelope screen
         const envScreen = document.getElementById("envelope-screen");
         envScreen.classList.remove("hidden");
         envScreen.classList.add("flex");
 
         const loader = document.getElementById("video-loader");
         const video = document.getElementById("cinematic-video");
-        function updateVideoFit() {
-          if (window.innerWidth >= 1024) {
-            // Laptop/Desktop
-            video.style.objectFit = "contain";
-          } else {
-            // Mobile/Tablet
-            video.style.objectFit = "cover";
-          }
-        }
 
-        window.addEventListener("resize", updateVideoFit);
-        updateVideoFit();
         if (!video) {
           revealMainContent();
           return;
         }
+
+        function updateVideoFit() {
+          video.style.objectFit =
+            window.innerWidth >= 1024 ? "contain" : "cover";
+        }
+
+        updateVideoFit();
+        window.addEventListener("resize", updateVideoFit);
 
         let finished = false;
 
@@ -976,39 +969,47 @@
         // Reset video
         video.pause();
         video.currentTime = 0;
+
+        // Show loader
+        loader.style.display = "flex";
+        loader.textContent = "Loading...";
+
+        // Load video normally
+        video.src = "Video-Project-103.mp4";
         video.load();
 
-        loader.style.display = "flex";
-
-        video.oncanplay = () => {
-          if (videoSkipped) return;
-
-          loader.style.display = "none";
-
-          video.play().catch(() => {
-            finish();
-          });
-        };
-
-        video.onended = finish;
-
-        video.onerror = finish;
-
+        // Show loader while buffering
         video.onwaiting = () => {
           loader.style.display = "flex";
+          loader.textContent = "Loading...";
         };
 
+        // Hide loader once playback starts
         video.onplaying = () => {
           loader.style.display = "none";
         };
+
+        // Play when enough data exists
+        video.oncanplaythrough = async () => {
+          if (videoSkipped) return;
+
+          try {
+            await video.play();
+          } catch (err) {
+            console.error(err);
+            finish();
+          }
+        };
+
+        video.onended = finish;
+        video.onerror = finish;
 
         // Safety timeout
         const timeout = setTimeout(() => {
           console.log("Video timeout");
           finish();
-        }, 15000);
+        }, 60000);
       }
-      // Bypasses the envelope animation entirely (Skip button)
       function skipEnvelopeAnimation() {
         videoSkipped = true;
 
