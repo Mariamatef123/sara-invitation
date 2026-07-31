@@ -1345,7 +1345,7 @@
           }
 
           // Show elegant success modal
-          showModal("success-modal");
+
           showGuestQR(guestName, companionsVal);
           // Reset the RSVP form state
           form.reset();
@@ -1371,20 +1371,24 @@
 
         const invitationId =
           "INV-" +
-          Date.now().toString(36).random().toString(36).slice(-6).toUpperCase();
+          Date.now().toString(36).toUpperCase() +
+          name.slice(0, 3).toUpperCase() +
+          companions;
+        const guestData = {
+          id: invitationId,
+          name: name,
+          companions: companions,
+          status: "Accepted",
+        };
 
         new QRCode(qrDiv, {
-          text: JSON.stringify({
-            id: invitationId,
-            name: name,
-            companions: companions,
-            status: "Accepted",
-          }),
+          text: JSON.stringify(guestData),
           width: 220,
           height: 220,
         });
 
-        showModal("qr-modal");
+        console.log("QR Data:", guestData);
+        showModal("success-modal");
       }
       async function submitApology() {
         const guestName = document.getElementById("guest-name").value.trim();
