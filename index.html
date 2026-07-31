@@ -699,23 +699,6 @@
               />
             </div>
 
-            <!-- Guest Email Input -->
-            <div class="flex flex-col text-right gap-1">
-              <label
-                for="guest-email"
-                class="font-cairo text-[10px] text-andalusia-darkgold/80 font-medium px-1"
-                >البريد الإلكتروني</label
-              >
-              <input
-                id="guest-email"
-                name="email"
-                type="email"
-                placeholder="البريد الإلكتروني"
-                required
-                class="w-full bg-white/20 backdrop-blur-sm border border-andalusia-gold/35 rounded-xl px-3 py-2.5 font-cairo text-xs text-andalusia-textdark placeholder-andalusia-textdark/40 focus:outline-none focus:ring-2 focus:ring-andalusia-gold/50 focus:border-andalusia-gold transition-all"
-              />
-            </div>
-
             <!-- Companions Counter -->
             <div class="flex flex-col text-right gap-1">
               <label
@@ -1177,10 +1160,10 @@
         const btnSubmit = document.getElementById("btn-submit");
         const btnSubmitText = document.getElementById("btn-submit-text");
         const guestName = document.getElementById("guest-name").value.trim();
-        const guestEmail = document.getElementById("guest-email").value.trim();
+
         const companionsVal = document.getElementById("companions-input").value;
 
-        if (!guestName || !guestEmail) return;
+        if (!guestName) return;
 
         const accessKeyInput = document.querySelector(
           'input[name="access_key"]',
