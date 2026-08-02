@@ -13,7 +13,6 @@
       href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@200..1000&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -293,13 +292,6 @@
   </head>
   <body class="no-scrollbar">
     <!-- Background Music Audio -->
-    <audio id="bg-music" loop preload="auto">
-      <source
-        src="06.%20Ludovico%20Einaudi%20-%20I%20Giorni.mp3"
-        type="audio/mp3"
-      />
-      <source src="06. Ludovico Einaudi - I Giorni.mp3" type="audio/mp3" />
-    </audio>
 
     <!-- Canvas Sparkles Overlay (Fairy Dust) -->
     <canvas id="sparkles-canvas"></canvas>
@@ -497,7 +489,7 @@
               <div class="text-right">
                 <p class="text-[10px] text-andalusia-darkgold/70">الوقت</p>
                 <p class="font-semibold text-xs text-andalusia-textdark">
-                  6:00 م — 11:00 م
+                  3:00 م — 6:00 م
                 </p>
               </div>
             </div>
@@ -847,21 +839,6 @@
 
     <!-- RSVP Attendance Success Modal -->
     <div
-      id="qr-modal"
-      class="fixed inset-0 hidden items-center justify-center bg-black/70 z-50"
-    >
-      <div class="bg-white rounded-2xl p-6 text-center">
-        <h2 class="text-2xl mb-4">بطاقة الحضور</h2>
-
-        <button
-          onclick="closeModal('qr-modal')"
-          class="mt-5 px-5 py-2 bg-blue-600 text-white rounded"
-        >
-          إغلاق
-        </button>
-      </div>
-    </div>
-    <div
       id="success-modal"
       class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-opacity duration-300"
     >
@@ -878,7 +855,16 @@
         <h3 class="font-ruqaa text-andalusia-gold text-2xl font-bold mt-2">
           تم تأكيد حضورك بنجاح!
         </h3>
-        <div id="guest-qr"></div>
+        <div id="guest-qr" class="w-full">
+          <a
+            href="https://photos.app.goo.gl/VmWsrwUvqKvJkBy18"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] hover:from-[#2e476d] hover:to-[#57709f] text-white font-cairo py-3 rounded-2xl shadow-md transition-all duration-300 text-sm font-semibold"
+          >
+            رفع الصور
+          </a>
+        </div>
         <p class="font-cairo text-andalusia-darkgold text-sm leading-relaxed">
           يسعدنا جداً ويشرفنا تلبية دعوتنا. ننتظر حضورك الكريم لنصنع معاً
           ذكرياتٍ لا تُنسى 💙
@@ -1137,7 +1123,7 @@
       // ----------------------------------------------------
       // COUNTDOWN TIMER LOGIC (Wedding Date: October 10, 2026)
       // ----------------------------------------------------
-      const targetDate = new Date("October 10, 2026 18:00:00").getTime();
+      const targetDate = new Date("October 10, 2026 15:00:00").getTime();
 
       function updateCountdown() {
         const now = new Date().getTime();
@@ -1181,9 +1167,9 @@
       const eventDescription =
         "يسعدنا ويشرفنا حضوركم حفل زفافنا في دار المدرعات مدينه نصر ومشاركتنا بهجة هذا اليوم السعيد.";
 
-      // Target ISO format for October 10, 2026, 18:00 to 23:00 GMT+3
-      const startISO = "20261010T180000";
-      const endISO = "20261010T230000";
+      // Target ISO format for October 10, 2026, 15:00 to 18:00 GMT+3
+      const startISO = "20261010T150000";
+      const endISO = "20261010T180000";
 
       // Google Calendar Link
       const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startISO}/${endISO}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
@@ -1367,27 +1353,18 @@
       }
       function showGuestQR(name, companions) {
         const qrDiv = document.getElementById("guest-qr");
-        qrDiv.innerHTML = "";
+        qrDiv.innerHTML = `
+          <a
+            href="https://photos.app.goo.gl/VmWsrwUvqKvJkBy18"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] hover:from-[#2e476d] hover:to-[#57709f] text-white font-cairo py-3 rounded-2xl shadow-md transition-all duration-300 text-sm font-semibold"
+          >
+            رفع الصور
+          </a>
+        `;
 
-        const invitationId =
-          "INV-" +
-          Date.now().toString(36).toUpperCase() +
-          name.slice(0, 3).toUpperCase() +
-          companions;
-        const guestData = {
-          id: invitationId,
-          name: name,
-          companions: companions,
-          status: "Accepted",
-        };
-
-        new QRCode(qrDiv, {
-          text: JSON.stringify(guestData),
-          width: 220,
-          height: 220,
-        });
-
-        console.log("QR Data:", guestData);
+        console.log("RSVP confirmed for:", name, "companions:", companions);
         showModal("success-modal");
       }
       async function submitApology() {
