@@ -4,15 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>دعوة زفاف محمد وسارة</title>
-    <!-- Tailwind CSS via CDN -->
+    <!-- Tailwind via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Aref Ruqaa, Amiri, and Cairo -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@200..1000&display=swap"
       rel="stylesheet"
     />
+    <!-- QRCode.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -37,99 +39,60 @@
         },
       };
     </script>
-
     <style>
-      /* Custom Styles and Animations */
       body {
         background-color: #eef1f6;
         color: #1f2937;
         overflow-x: hidden;
         font-family: "Cairo", sans-serif;
       }
-
-      /* Standard 3D Envelope styles */
-      .envelope-container {
-        perspective: 1000px;
-      }
-
-      .envelope {
-        position: relative;
-        background-color: #33445e;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        transition: transform 1s ease;
-      }
-
-      .envelope-flap {
-        position: absolute;
-        top: 0;
-        left: 0;
+      .andalusian-card {
+        background: linear-gradient(
+          346deg,
+          rgba(75, 82, 180, 0.17),
+          rgba(224, 232, 247, 0.05),
+          rgba(112, 161, 255, 0.19)
+        );
+        border: 1px solid rgba(0, 0, 3, 0.4);
+        border-radius: 2rem;
         width: 100%;
-        height: 50%;
-        background-color: #3d5170;
-        clip-path: polygon(0 0, 50% 100%, 100% 0);
-        transform-origin: top;
+        max-width: 460px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition:
-          transform 1s ease-in-out,
-          z-index 0s 0.5s;
-        z-index: 30;
+          transform 0.3s ease,
+          border-color 0.3s ease;
       }
-
-      .envelope.open .envelope-flap {
-        transform: rotateX(180deg);
-        z-index: 10;
+      .andalusian-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.65);
       }
-
-      .envelope-pocket {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 50%;
-        background-color: #2c3c54;
-        clip-path: polygon(0 100%, 0 0, 50% 50%, 100% 0, 100% 100%);
-        z-index: 20;
+      @media (max-width: 480px) {
+        .andalusian-card {
+          padding: 2rem 1.5rem;
+          max-width: 100%;
+        }
       }
-
-      .envelope-pocket-sides {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #27354a;
-        clip-path: polygon(0 100%, 50% 50%, 100% 100%);
-        z-index: 25;
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
       }
-
-      .envelope-card {
-        position: absolute;
-        bottom: 5%;
-        left: 5%;
-        width: 90%;
-        height: 90%;
-        background-color: #fbfcfe;
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(40px);
         transition:
-          transform 1.5s ease-in-out 0.8s,
-          opacity 1s ease-in-out;
-        z-index: 15;
-        opacity: 0.8;
+          opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
       }
-
-      .envelope.open .envelope-card {
-        transform: translateY(-65%) scale(1.05);
+      .scroll-reveal.visible {
         opacity: 1;
-        z-index: 35;
-      }
-
-      /* Particles canvas overlay */
-      #sparkles-canvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 1;
+        transform: translateY(0);
       }
       #video-container {
         position: fixed;
@@ -140,15 +103,11 @@
         background: #000;
         overflow: hidden;
       }
-      /* Mobile & Tablet */
       #cinematic-video {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
-
-      /* Laptop/Desktop */
-
       @media (min-width: 1024px) {
         #cinematic-video {
           object-fit: contain;
@@ -156,8 +115,6 @@
             center center / cover no-repeat;
         }
       }
-
-      /* Pulsing and float animation */
       @keyframes pulse-gold {
         0%,
         100% {
@@ -174,8 +131,6 @@
       .animate-pulse-gold {
         animation: pulse-gold 2.5s infinite ease-in-out;
       }
-
-      /* Soft ambient rings behind the intro star */
       @keyframes ring-expand {
         0% {
           transform: scale(0.6);
@@ -203,7 +158,6 @@
       .intro-ring.delay-2 {
         animation-delay: 2.1s;
       }
-
       @keyframes intro-fade-up {
         0% {
           opacity: 0;
@@ -223,80 +177,36 @@
       .intro-fade-3 {
         animation: intro-fade-up 1s ease-out 0.9s both;
       }
-
-      /* Plain card sizing and styling - Responsive & layout-safe on desktop + mobile */
-      /* Made lighter / more glass-like so the background photo reads through clearly */
-      .andalusian-card {
-        /* background: transparent; */
-        background: linear-gradient(
-          346deg,
-          rgb(75 82 180 / 17%),
-          rgba(224, 232, 247, 0.05),
-          rgb(112 161 255 / 19%)
-        );
-        border: 1px solid rgb(0 0 3 / 40%);
-
-        box-shadow: none;
-
-        border-radius: 2rem;
+      #sparkles-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
-        max-width: 460px;
-        margin: 0 auto;
-        padding: 2.5rem 2rem;
-
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+      }
+      /* QR container style */
+      #qr-code-container {
         display: flex;
-        align-items: center;
         justify-content: center;
-
-        transition:
-          transform 0.3s ease,
-          box-shadow 0.3s ease,
-          background-color 0.3s ease;
+        align-items: center;
+        margin: 8px 0;
       }
-      .andalusian-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(255, 255, 255, 0.65);
-      }
-
-      /* Responsive padding adjustments for smaller mobile screens */
-      @media (max-width: 480px) {
-        .andalusian-card {
-          padding: 2rem 1.5rem;
-          max-width: 100%;
-        }
-      }
-
-      /* Hide scrollbars but allow scrolling */
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-      }
-
-      /* Scroll Reveal Animation Styles */
-      .scroll-reveal {
-        opacity: 0;
-        transform: translateY(40px);
-        transition:
-          opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-          transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      .scroll-reveal.visible {
-        opacity: 1;
-        transform: translateY(0);
+      #qr-code-container img,
+      #qr-code-container canvas {
+        max-width: 140px;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
     </style>
   </head>
   <body class="no-scrollbar">
-    <!-- Background Music Audio -->
-
-    <!-- Canvas Sparkles Overlay (Fairy Dust) -->
+    <!-- Canvas Sparkles -->
     <canvas id="sparkles-canvas"></canvas>
 
-    <!-- Static background image layer with transparency -->
+    <!-- Static background -->
     <div
       class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat -z-10 pointer-events-none"
       style="
@@ -304,7 +214,7 @@
       "
     ></div>
 
-    <!-- 1. TAP TO OPEN COVER SCREEN -->
+    <!-- 1. COVER SCREEN -->
     <div
       id="cover-screen"
       class="fixed inset-0 flex flex-col items-center justify-center z-50 transition-opacity duration-1000 ease-out"
@@ -318,12 +228,9 @@
       "
     >
       <div class="text-center flex flex-col items-center px-6 relative">
-        <!-- Ambient expanding rings -->
         <div class="intro-ring"></div>
         <div class="intro-ring delay-1"></div>
         <div class="intro-ring delay-2"></div>
-
-        <!-- Pulsing star -->
         <button
           onclick="openInvitation()"
           class="focus:outline-none select-none active:scale-95 transition-transform duration-200 relative intro-fade-1"
@@ -332,19 +239,16 @@
             viewBox="0 0 100 100"
             class="w-24 h-24 text-andalusia-green fill-current animate-pulse-gold cursor-pointer"
           >
-            <!-- Elegant four-pointed star (diamond star) -->
             <path
               d="M50 10 Q50 40 10 50 Q40 50 50 90 Q50 60 90 50 Q60 50 50 10 Z"
             />
           </svg>
         </button>
-
         <p
           class="text-andalusia-green font-amiri text-sm tracking-[0.35em] mt-10 mb-3 intro-fade-2 select-none"
         >
           محمد &amp; سارة
         </p>
-
         <h2
           class="text-white font-ruqaa text-3xl mb-2 tracking-wide cursor-pointer select-none intro-fade-3"
           onclick="openInvitation()"
@@ -354,20 +258,17 @@
       </div>
     </div>
 
-    <!-- 2. POSTAL CARD ENVELOPE SCREEN -->
+    <!-- 2. ENVELOPE / VIDEO SCREEN -->
     <div
       id="envelope-screen"
       class="fixed inset-0 bg-[#1c2738]/95 backdrop-blur-md hidden flex items-center justify-center z-40 transition-opacity duration-1000"
     >
-      <!-- Skip Button (تخطي) -->
       <button
         onclick="skipEnvelopeAnimation()"
         class="absolute top-6 left-6 z-50 px-5 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-sm font-cairo hover:bg-white/25 transition-all duration-300 hover:scale-105 active:scale-95"
       >
         ⏭ تخطي
       </button>
-
-      <!-- Video container for cinematic opening -->
       <div
         id="video-container"
         class="fixed inset-0 flex items-center justify-center bg-black"
@@ -387,12 +288,12 @@
       </div>
     </div>
 
-    <!-- 3. MAIN INVITATION CONTENT -->
+    <!-- 3. MAIN CONTENT -->
     <main
       id="main-content"
       class="relative z-10 min-h-screen py-10 px-4 flex flex-col items-center gap-12 max-w-lg mx-auto hidden transition-opacity duration-1000 ease-in"
     >
-      <!-- CARD 1: WELCOME & DETAILS -->
+      <!-- CARD 1: WELCOME -->
       <section class="andalusian-card w-full scroll-reveal">
         <div
           class="w-full text-center flex flex-col items-center justify-center gap-4"
@@ -400,29 +301,20 @@
           <span class="text-andalusia-gold font-amiri text-sm tracking-widest"
             >زفاف</span
           >
-
-          <!-- Groom Name -->
           <h1
             class="font-ruqaa text-andalusia-gold text-5xl my-1 drop-shadow-sm font-semibold select-text"
           >
             محمد
           </h1>
-
-          <!-- Ampersand -->
           <span class="text-andalusia-gold font-amiri text-2xl">&</span>
-
-          <!-- Bride Name -->
           <h1
             class="font-ruqaa text-andalusia-gold text-5xl my-1 drop-shadow-sm font-semibold select-text"
           >
             سارة
           </h1>
-
-          <!-- Poetry Box -->
           <div
             class="border border-andalusia-gold/20 bg-white/10 backdrop-blur-sm p-4 rounded-lg my-2 w-full max-w-[280px] relative"
           >
-            <!-- Decorative corner designs in CSS -->
             <div
               class="absolute top-1 right-1 w-2 h-2 border-t border-r border-andalusia-gold/40"
             ></div>
@@ -435,7 +327,6 @@
             <div
               class="absolute bottom-1 left-1 w-2 h-2 border-b border-l border-andalusia-gold/40"
             ></div>
-
             <div
               class="font-amiri text-andalusia-darkgold text-sm md:text-base leading-relaxed flex flex-col gap-1 select-text"
             >
@@ -445,19 +336,15 @@
               <p>حُبٍّ يُعَطِّرُ سَائِرَ الأَزْمَانِ</p>
             </div>
           </div>
-
-          <!-- Event Details List -->
           <div
             class="flex flex-col gap-2.5 w-full max-w-[280px] font-cairo text-sm select-text"
           >
-            <!-- Date block -->
             <div
               class="flex items-center gap-3 bg-white/15 backdrop-blur-sm border border-andalusia-gold/15 px-3.5 py-2 rounded-xl shadow-sm"
             >
               <div
                 class="w-8 h-8 rounded-full bg-andalusia-cream/70 flex items-center justify-center text-andalusia-gold shadow-inner shrink-0"
               >
-                <!-- Calendar Icon -->
                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path
                     d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"
@@ -471,15 +358,12 @@
                 </p>
               </div>
             </div>
-
-            <!-- Time block -->
             <div
               class="flex items-center gap-3 bg-white/15 backdrop-blur-sm border border-andalusia-gold/15 px-3.5 py-2 rounded-xl shadow-sm"
             >
               <div
                 class="w-8 h-8 rounded-full bg-andalusia-cream/70 flex items-center justify-center text-andalusia-gold shadow-inner shrink-0"
               >
-                <!-- Clock Icon -->
                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path
                     d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"
@@ -493,15 +377,12 @@
                 </p>
               </div>
             </div>
-
-            <!-- Place block -->
             <div
               class="flex items-center gap-3 bg-white/15 backdrop-blur-sm border border-andalusia-gold/15 px-3.5 py-2 rounded-xl shadow-sm"
             >
               <div
                 class="w-8 h-8 rounded-full bg-andalusia-cream/70 flex items-center justify-center text-andalusia-gold shadow-inner shrink-0"
               >
-                <!-- Map Pin Icon -->
                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path
                     d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
@@ -516,8 +397,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Google Maps Redirect Button -->
           <a
             href="https://maps.app.goo.gl/obBCV4DVQu7NtGq4A?g_st=aw"
             target="_blank"
@@ -542,13 +421,10 @@
           <span class="text-andalusia-gold font-amiri text-lg"
             >العدّ التنازلي</span
           >
-
-          <!-- Countdown Grid -->
           <div
             class="grid grid-cols-4 gap-2 w-full max-w-[300px] my-1"
             dir="ltr"
           >
-            <!-- Days -->
             <div
               class="flex flex-col items-center bg-white/15 backdrop-blur-sm border border-andalusia-gold/25 rounded-2xl py-2.5 px-1 shadow-sm shrink-0"
             >
@@ -562,7 +438,6 @@
                 >يوم</span
               >
             </div>
-            <!-- Hours -->
             <div
               class="flex flex-col items-center bg-white/15 backdrop-blur-sm border border-andalusia-gold/25 rounded-2xl py-2.5 px-1 shadow-sm shrink-0"
             >
@@ -576,7 +451,6 @@
                 >ساعة</span
               >
             </div>
-            <!-- Minutes -->
             <div
               class="flex flex-col items-center bg-white/15 backdrop-blur-sm border border-andalusia-gold/25 rounded-2xl py-2.5 px-1 shadow-sm shrink-0"
             >
@@ -590,7 +464,6 @@
                 >دقيقة</span
               >
             </div>
-            <!-- Seconds -->
             <div
               class="flex flex-col items-center bg-white/15 backdrop-blur-sm border border-andalusia-gold/25 rounded-2xl py-2.5 px-1 shadow-sm shrink-0"
             >
@@ -605,14 +478,11 @@
               >
             </div>
           </div>
-
-          <!-- Calendar Buttons -->
           <div class="flex flex-col gap-2 w-full max-w-[280px] mt-2">
             <p class="text-andalusia-darkgold font-cairo text-xs font-semibold">
               أضف للتقويم
             </p>
             <div class="grid grid-cols-2 gap-2.5 w-full">
-              <!-- Google Calendar -->
               <a
                 id="btn-google-cal"
                 href="#"
@@ -627,7 +497,6 @@
                 </svg>
                 <span>Google</span>
               </a>
-              <!-- Apple Calendar -->
               <button
                 onclick="downloadAppleCalendar()"
                 class="bg-white/25 hover:bg-white/40 border border-andalusia-gold/25 hover:border-andalusia-gold/50 text-andalusia-darkgold text-[11px] font-cairo font-medium py-2 px-3 rounded-full flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
@@ -644,7 +513,7 @@
         </div>
       </section>
 
-      <!-- CARD 4: RSVP (CONFIRM ATTENDANCE) -->
+      <!-- CARD 3: RSVP (CONFIRM) -->
       <section class="andalusian-card w-full scroll-reveal">
         <div
           class="w-full text-center flex flex-col items-center justify-center gap-4"
@@ -652,28 +521,23 @@
           <div
             class="w-10 h-10 bg-andalusia-cream/70 rounded-full flex items-center justify-center text-andalusia-gold shadow-md shrink-0"
           >
-            <!-- Guests Icon -->
             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
               <path
                 d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
               />
             </svg>
           </div>
-
           <h2 class="text-andalusia-gold font-ruqaa text-2xl font-semibold">
             تأكيد الحضور
           </h2>
           <p class="font-cairo text-andalusia-darkgold/80 text-xs">
             يسعدنا أن تشاركنا هذه المناسبة
           </p>
-
-          <!-- RSVP Form -->
           <form
             id="rsvp-form"
             onsubmit="submitRSVP(event)"
             class="w-full max-w-[280px] flex flex-col gap-3"
           >
-            <!-- Web3Forms Config - To use, visit https://web3forms.com to get your free key and paste it here -->
             <input
               type="hidden"
               name="access_key"
@@ -689,15 +553,12 @@
               name="from_name"
               value="Wedding Website RSVP"
             />
-            <!-- Honeypot: hidden bot-trap field required by Web3Forms spam protection -->
             <input
               type="checkbox"
               name="botcheck"
               class="hidden"
               style="display: none"
             />
-
-            <!-- Guest Name Input -->
             <div class="flex flex-col text-right gap-1">
               <label
                 for="guest-name"
@@ -708,13 +569,11 @@
                 id="guest-name"
                 name="Guest_Name"
                 type="text"
-                placeholder="اسمك الكريم"
+                placeholder="اسمك بالكامل"
                 required
                 class="w-full bg-white/20 backdrop-blur-sm border border-andalusia-gold/35 rounded-xl px-3 py-2.5 font-cairo text-xs text-andalusia-textdark placeholder-andalusia-textdark/40 focus:outline-none focus:ring-2 focus:ring-andalusia-gold/50 focus:border-andalusia-gold transition-all"
               />
             </div>
-
-            <!-- Companions Counter -->
             <div class="flex flex-col text-right gap-1">
               <label
                 class="font-cairo text-[10px] text-andalusia-darkgold/80 font-medium px-1"
@@ -723,15 +582,12 @@
               <div
                 class="w-full bg-white/20 backdrop-blur-sm border border-andalusia-gold/35 rounded-xl p-1.5 flex items-center justify-between shadow-sm"
               >
-                <!-- Hidden input to submit the actual value -->
                 <input
                   type="hidden"
                   id="companions-input"
                   name="Companions_Count"
                   value="0"
                 />
-
-                <!-- Plus Button -->
                 <button
                   type="button"
                   onclick="changeCompanions(1)"
@@ -739,15 +595,11 @@
                 >
                   +
                 </button>
-
-                <!-- Counter Display -->
                 <span
                   id="companions-display"
                   class="font-serif text-andalusia-gold text-lg font-bold select-none"
                   >0</span
                 >
-
-                <!-- Minus Button -->
                 <button
                   type="button"
                   id="btn-minus"
@@ -759,16 +611,12 @@
                 </button>
               </div>
             </div>
-
-            <!-- Submit and Apologize Buttons -->
             <div class="grid grid-cols-2 gap-2 mt-2">
-              <!-- Apologize Button -->
               <button
                 type="button"
                 onclick="submitApology()"
                 class="w-full bg-white/20 hover:bg-white/35 border border-andalusia-gold/35 text-andalusia-darkgold font-cairo font-medium py-2.5 rounded-xl flex items-center justify-center gap-1 transition-all shadow-sm active:scale-98 text-xs cursor-pointer"
               >
-                <!-- Apologize Cross Icon -->
                 <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                   <path
                     d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
@@ -776,14 +624,11 @@
                 </svg>
                 <span>أعتذر</span>
               </button>
-
-              <!-- Submit Button -->
               <button
                 type="submit"
                 id="btn-submit"
                 class="w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] hover:from-[#2e476d] hover:to-[#57709f] text-white font-cairo font-medium py-2.5 rounded-xl flex items-center justify-center gap-1 transition-all shadow-sm hover:shadow-md active:scale-98 text-xs cursor-pointer"
               >
-                <!-- Attend Check Icon -->
                 <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                 </svg>
@@ -794,12 +639,11 @@
         </div>
       </section>
 
-      <!-- CARD 5: FOOTER -->
+      <!-- CARD 4: FOOTER with QR CODE for UPLOAD PHOTOS -->
       <section class="andalusian-card w-full scroll-reveal">
         <div
           class="w-full text-center flex flex-col items-center justify-center gap-4"
         >
-          <!-- Interlocking wedding rings -->
           <div class="text-andalusia-gold shrink-0">
             <svg viewBox="0 0 100 60" class="w-18 h-12 fill-current">
               <circle
@@ -820,7 +664,6 @@
               />
             </svg>
           </div>
-
           <h2
             class="font-ruqaa text-andalusia-gold text-3xl font-semibold select-text"
           >
@@ -831,13 +674,75 @@
           >
             شكرًا لكونكم جزءًا من فرحتنا
           </p>
+
+          <!-- UPLOAD PHOTOS BUTTON (footer) - now shows QR code modal -->
+          <button
+            onclick="openUploadModal()"
+            class="mt-2 w-full max-w-[220px] bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] hover:from-[#2e476d] hover:to-[#57709f] text-white font-cairo py-2.5 px-4 rounded-full text-center flex items-center justify-center gap-2 shadow-sm hover:shadow-md font-medium text-xs md:text-sm transition-all duration-300 cursor-pointer"
+          >
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            <span>رفع الصور</span>
+          </button>
         </div>
       </section>
     </main>
 
-    <!-- SUCCESS MODALS AND DIALOGS -->
+    <!-- UPLOAD MODAL (asks for guest name, then shows QR code of drive folder) -->
+    <div
+      id="upload-modal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-opacity duration-300"
+    >
+      <div
+        class="bg-andalusia-cardbg border border-andalusia-gold/40 rounded-2xl p-8 max-w-md w-full text-center flex flex-col items-center gap-4 shadow-xl"
+      >
+        <div
+          class="w-16 h-16 bg-andalusia-cream rounded-full flex items-center justify-center text-andalusia-gold shadow-md shrink-0"
+        >
+          <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+          </svg>
+        </div>
+        <h3 class="font-ruqaa text-andalusia-gold text-2xl font-bold">
+          رفع الصور
+        </h3>
+        <p class="font-cairo text-andalusia-darkgold text-sm">
+          أدخل اسمك بالكامل لإنشاء مجلد خاص بك والحصول على رمز QR
+        </p>
+        <input
+          id="upload-guest-name"
+          type="text"
+          placeholder="اسمك بالكامل"
+          class="w-full bg-white/20 backdrop-blur-sm border border-andalusia-gold/35 rounded-xl px-3 py-2.5 font-cairo text-xs text-andalusia-textdark placeholder-andalusia-textdark/40 focus:outline-none focus:ring-2 focus:ring-andalusia-gold/50"
+        />
+        <div class="flex gap-3 w-full mt-2">
+          <button
+            onclick="closeModal('upload-modal')"
+            class="flex-1 bg-white/30 hover:bg-white/40 text-andalusia-darkgold font-cairo font-medium py-2.5 rounded-xl text-sm transition-all"
+          >
+            إلغاء
+          </button>
+          <button
+            onclick="handleUploadPhotos()"
+            class="flex-1 bg-gradient-to-r from-[#57709f] to-[#2e476d] text-white font-cairo font-medium py-2.5 rounded-xl text-sm transition-all hover:shadow-md active:scale-95 cursor-pointer"
+          >
+            عرض QR
+          </button>
+        </div>
+        <!-- QR code will be injected here -->
+        <div
+          id="qr-code-container"
+          class="w-full flex justify-center mt-2"
+        ></div>
+        <!-- <p
+          id="qr-folder-link"
+          class="text-xs text-andalusia-darkgold/70 break-all"
+        ></p> -->
+      </div>
+    </div>
 
-    <!-- RSVP Attendance Success Modal -->
+    <!-- RSVP Success Modal (kept) -->
     <div
       id="success-modal"
       class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-opacity duration-300"
@@ -855,16 +760,15 @@
         <h3 class="font-ruqaa text-andalusia-gold text-2xl font-bold mt-2">
           تم تأكيد حضورك بنجاح!
         </h3>
-        <div id="guest-qr" class="w-full">
+        <!-- <div id="guest-qr" class="w-full">
           <a
             href="https://photos.app.goo.gl/VmWsrwUvqKvJkBy18"
             target="_blank"
             rel="noopener noreferrer"
-            class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] hover:from-[#2e476d] hover:to-[#57709f] text-white font-cairo py-3 rounded-2xl shadow-md transition-all duration-300 text-sm font-semibold"
+            class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] text-white font-cairo py-3 rounded-2xl shadow-md transition-all duration-300 text-sm font-semibold"
+            >رفع الصور</a
           >
-            رفع الصور
-          </a>
-        </div>
+        </div> -->
         <p class="font-cairo text-andalusia-darkgold text-sm leading-relaxed">
           يسعدنا جداً ويشرفنا تلبية دعوتنا. ننتظر حضورك الكريم لنصنع معاً
           ذكرياتٍ لا تُنسى 💙
@@ -878,7 +782,7 @@
       </div>
     </div>
 
-    <!-- RSVP Apology Success Modal -->
+    <!-- Apology Modal -->
     <div
       id="apology-modal"
       class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-opacity duration-300"
@@ -889,7 +793,6 @@
         <div
           class="w-16 h-16 bg-andalusia-cream rounded-full flex items-center justify-center text-andalusia-gold shadow-md shrink-0"
         >
-          <!-- Heart Icon -->
           <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
             <path
               d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
@@ -912,90 +815,63 @@
       </div>
     </div>
 
-    <!-- MAIN JAVASCRIPT -->
+    <!-- ========== JAVASCRIPT ========== -->
     <script>
-      const invitationId = "INV-" + Date.now().toString(36).toUpperCase();
+      // ----------------------------------------------------
+      // GLOBALS
+      // ----------------------------------------------------
+      const APPS_SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbzD3uZdaIGPMNhSffORSSPCEXyNE22CmsjjUwIg94Gu7hbin7AiI1M0YK5JcVh8vXMZ/exec";
       let invitationOpened = false;
       let videoSkipped = false;
 
+      // ----------------------------------------------------
+      // COVER / ENVELOPE
+      // ----------------------------------------------------
       async function openInvitation() {
         if (invitationOpened) return;
         invitationOpened = true;
-
-        // Play background music
-        const bgMusic = document.getElementById("bg-music");
-        bgMusic.play().catch(console.log);
-
-        // Hide cover
         const cover = document.getElementById("cover-screen");
         cover.classList.add("opacity-0");
-
-        setTimeout(() => {
-          cover.classList.add("hidden");
-        }, 1000);
-
-        // Show envelope screen
+        setTimeout(() => cover.classList.add("hidden"), 1000);
         const envScreen = document.getElementById("envelope-screen");
         envScreen.classList.remove("hidden");
         envScreen.classList.add("flex");
-
         const loader = document.getElementById("video-loader");
         const video = document.getElementById("cinematic-video");
-
         if (!video) {
           revealMainContent();
           return;
         }
-
         function updateVideoFit() {
           video.style.objectFit =
             window.innerWidth >= 1024 ? "contain" : "cover";
         }
-
         updateVideoFit();
         window.addEventListener("resize", updateVideoFit);
-
         let finished = false;
-
         function finish() {
           if (finished || videoSkipped) return;
-
           finished = true;
-
           clearTimeout(timeout);
-
           video.pause();
-
           revealMainContent();
         }
-
-        // Reset video
         video.pause();
         video.currentTime = 0;
-
-        // Show loader
         loader.style.display = "flex";
         loader.textContent = "Loading...";
-
-        // Load video normally
         video.src = "Video-Project-103.mp4";
         video.load();
-
-        // Show loader while buffering
         video.onwaiting = () => {
           loader.style.display = "flex";
           loader.textContent = "Loading...";
         };
-
-        // Hide loader once playback starts
         video.onplaying = () => {
           loader.style.display = "none";
         };
-
-        // Play when enough data exists
         video.oncanplaythrough = async () => {
           if (videoSkipped) return;
-
           try {
             await video.play();
           } catch (err) {
@@ -1003,54 +879,41 @@
             finish();
           }
         };
-
         video.onended = finish;
         video.onerror = finish;
-
-        // Safety timeout
         const timeout = setTimeout(() => {
           console.log("Video timeout");
           finish();
         }, 60000);
       }
+
       function skipEnvelopeAnimation() {
         videoSkipped = true;
-
         const video = document.getElementById("cinematic-video");
-
         if (video) {
           video.pause();
           video.currentTime = 0;
-
-          // Remove all video events
           video.onended = null;
           video.onerror = null;
           video.onwaiting = null;
           video.onplaying = null;
           video.oncanplay = null;
         }
-
         revealMainContent();
       }
-      // Fades out envelope screen and fades in main invitation details
+
       function revealMainContent() {
-        // Clear timeouts just in case
         if (window.cinematicTimeouts) {
           window.cinematicTimeouts.forEach((t) => clearTimeout(t));
         }
-
         const cover = document.getElementById("cover-screen");
         const envScreen = document.getElementById("envelope-screen");
         const mainContent = document.getElementById("main-content");
-
         cover.classList.add("hidden");
-
         envScreen.classList.add("opacity-0");
         setTimeout(() => {
           envScreen.classList.add("hidden");
           envScreen.classList.remove("flex");
-
-          // Show and fade in main content
           mainContent.classList.remove("hidden");
           mainContent.style.opacity = "0";
           setTimeout(() => {
@@ -1059,18 +922,18 @@
         }, 800);
       }
 
-      // Floating Dust Particle Canvas Effect
+      // ----------------------------------------------------
+      // SPARKLES
+      // ----------------------------------------------------
       const canvas = document.getElementById("sparkles-canvas");
       const ctx = canvas.getContext("2d");
       let particles = [];
-
       function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       }
       window.addEventListener("resize", resizeCanvas);
       resizeCanvas();
-
       class Sparkle {
         constructor() {
           this.x = Math.random() * canvas.width;
@@ -1103,13 +966,8 @@
           ctx.fill();
         }
       }
-
-      // Initialize particles
-      const particleCount = Math.min(35, Math.floor(window.innerWidth / 20));
-      for (let i = 0; i < particleCount; i++) {
+      for (let i = 0; i < Math.min(35, Math.floor(window.innerWidth / 20)); i++)
         particles.push(new Sparkle());
-      }
-
       function animateSparkles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let p of particles) {
@@ -1121,32 +979,25 @@
       animateSparkles();
 
       // ----------------------------------------------------
-      // COUNTDOWN TIMER LOGIC (Wedding Date: October 10, 2026)
+      // COUNTDOWN
       // ----------------------------------------------------
       const targetDate = new Date("October 10, 2026 15:00:00").getTime();
-
       function updateCountdown() {
         const now = new Date().getTime();
-        const difference = targetDate - now;
-
-        if (difference <= 0) {
+        const diff = targetDate - now;
+        if (diff <= 0) {
           document.getElementById("timer-days").innerText = "0";
           document.getElementById("timer-hours").innerText = "0";
           document.getElementById("timer-minutes").innerText = "0";
           document.getElementById("timer-seconds").innerText = "0";
           return;
         }
-
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor(
-          (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
         );
-        const minutes = Math.floor(
-          (difference % (1000 * 60 * 60)) / (1000 * 60),
-        );
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-        // Format numbers
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         document.getElementById("timer-days").innerText = days;
         document.getElementById("timer-hours").innerText =
           hours < 10 ? "0" + hours : hours;
@@ -1155,46 +1006,34 @@
         document.getElementById("timer-seconds").innerText =
           seconds < 10 ? "0" + seconds : seconds;
       }
-
       setInterval(updateCountdown, 1000);
-      updateCountdown(); // Run immediately
+      updateCountdown();
 
       // ----------------------------------------------------
-      // CALENDAR REDIRECT LINKS (October 10, 2026)
+      // CALENDAR
       // ----------------------------------------------------
       const eventTitle = "زفاف محمد وسارة";
       const eventLocation = "دار المدرعات مدينه نصر";
       const eventDescription =
         "يسعدنا ويشرفنا حضوركم حفل زفافنا في دار المدرعات مدينه نصر ومشاركتنا بهجة هذا اليوم السعيد.";
-
-      // Target ISO format for October 10, 2026, 15:00 to 18:00 GMT+3
       const startISO = "20261010T150000";
       const endISO = "20261010T180000";
-
-      // Google Calendar Link
-      const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startISO}/${endISO}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
-      document.getElementById("btn-google-cal").href = googleCalUrl;
-
-      // Apple Calendar iCal Generation (.ics File Download)
+      document.getElementById("btn-google-cal").href =
+        `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startISO}/${endISO}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
       function downloadAppleCalendar() {
-        const icsContent =
-          "BEGIN:VCALENDAR\r\n" +
-          "VERSION:2.0\r\n" +
-          "PRODID:-//Andalusian Wedding Invitation//EN\r\n" +
-          "BEGIN:VEVENT\r\n" +
-          "UID:wedding-mohamed-sara-2026@nfrah\r\n" +
-          "DTSTAMP:20260620T120000Z\r\n" +
-          `DTSTART;TZID=GMT+3:${startISO}\r\n` +
-          `DTEND;TZID=GMT+3:${endISO}\r\n` +
-          `SUMMARY:${eventTitle}\r\n` +
-          `DESCRIPTION:${eventDescription}\r\n` +
-          `LOCATION:${eventLocation}\r\n` +
-          "END:VEVENT\r\n" +
-          "END:VCALENDAR";
-
-        const blob = new Blob([icsContent], {
-          type: "text/calendar;charset=utf-8",
-        });
+        const ics =
+          "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Andalusian Wedding Invitation//EN\r\nBEGIN:VEVENT\r\nUID:wedding-mohamed-sara-2026@nfrah\r\nDTSTAMP:20260620T120000Z\r\nDTSTART;TZID=GMT+3:" +
+          startISO +
+          "\r\nDTEND;TZID=GMT+3:" +
+          endISO +
+          "\r\nSUMMARY:" +
+          eventTitle +
+          "\r\nDESCRIPTION:" +
+          eventDescription +
+          "\r\nLOCATION:" +
+          eventLocation +
+          "\r\nEND:VEVENT\r\nEND:VCALENDAR";
+        const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
         link.download = "wedding-invitation.ics";
@@ -1204,20 +1043,17 @@
       }
 
       // ----------------------------------------------------
-      // COMPANION COUNTER LOGIC
+      // RSVP / COMPANIONS
       // ----------------------------------------------------
       let companions = 0;
       const compDisplay = document.getElementById("companions-display");
       const compInput = document.getElementById("companions-input");
       const btnMinus = document.getElementById("btn-minus");
-
       function changeCompanions(amount) {
         companions += amount;
         if (companions < 0) companions = 0;
-
         compDisplay.innerText = companions;
         compInput.value = companions;
-
         if (companions === 0) {
           btnMinus.disabled = true;
           btnMinus.classList.add("cursor-not-allowed", "opacity-50");
@@ -1227,226 +1063,70 @@
         }
       }
 
-      // ----------------------------------------------------
-      // RSVP FORM WEB3FORMS SUBMISSION & MAILTO FALLBACK
-      // ----------------------------------------------------
       async function submitRSVP(event) {
         event.preventDefault();
-
         const form = document.getElementById("rsvp-form");
-        const btnSubmit = document.getElementById("btn-submit");
-        const btnSubmitText = document.getElementById("btn-submit-text");
         const guestName = document.getElementById("guest-name").value.trim();
-
         const companionsVal = document.getElementById("companions-input").value;
-
         if (!guestName) return;
+        try {
+          const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ guestName: guestName }),
+          });
+          const data = await response.json();
+          // // const qrDiv = document.getElementById("guest-qr");
+          // qrDiv.innerHTML = `<a href="${data.uploadUrl}" target="_blank" class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] text-white font-cairo py-3 rounded-2xl shadow-md text-sm font-semibold">رفع الصور</a>`;
 
-        const accessKeyInput = document.querySelector(
-          'input[name="access_key"]',
-        );
-        const accessKey = accessKeyInput.value.trim();
-
-        const subject = encodeURIComponent("تأكيد حضور زفاف جديد — محمد وسارة");
-        const messageBody = `مرحباً محمد وسارة،\n\nيسعدني تأكيد حضوري لحفل زفافكم السعيد!\n\nالاسم: ${guestName}\nعدد المرافقين: ${companionsVal}\n\nدمتم بكل خير ومسرات!`;
-        const mailtoUrl = `mailto:mariamatef353@gmail.com?subject=${subject}&body=${encodeURIComponent(
-          messageBody,
-        )}`;
-
-        function fallbackToMailClient() {
-          window.location.href = mailtoUrl;
           showModal("success-modal");
           form.reset();
           resetFormCounter();
-        }
-
-        // 1. SMART FALLBACK MECHANISM (mailto):
-        // If the Web3Forms key hasn't been set by the user (still placeholder),
-        // open native email application with pre-filled content.
-        if (
-          accessKey === "YOUR_WEB3FORMS_ACCESS_KEY_HERE" ||
-          accessKey === ""
-        ) {
-          fallbackToMailClient();
-          return;
-        }
-
-        // 2. SEAMLESS BACKGROUND SENDING (when real key is set):
-        // Set loading state inside the submit button
-        btnSubmit.disabled = true;
-        btnSubmit.classList.add("opacity-75", "cursor-not-allowed");
-        btnSubmitText.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>جاري الإرسال...</span>
-            `;
-
-        const formData = new FormData(form);
-        formData.append("message", messageBody);
-
-        try {
-          // First Web3Forms account
-          const formData1 = new FormData(form);
-          formData1.append("message", messageBody);
-          formData1.set("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
-
-          // Second Web3Forms account
-          const formData2 = new FormData(form);
-          formData2.append("message", messageBody);
-          formData2.set("access_key", "70196fed-cfe6-49e8-ac4c-7b86e7c3eaec");
-
-          // Send to both accounts
-          const [response1, response2] = await Promise.all([
-            fetch("https://api.web3forms.com/submit", {
-              method: "POST",
-              body: formData1,
-              headers: {
-                Accept: "application/json",
-              },
-            }),
-            fetch("https://api.web3forms.com/submit", {
-              method: "POST",
-              body: formData2,
-              headers: {
-                Accept: "application/json",
-              },
-            }),
-          ]);
-
-          const data1 = await response1.json();
-          const data2 = await response2.json();
-
-          console.log("Account 1:", data1);
-          console.log("Account 2:", data2);
-
-          if (
-            (!response1.ok || data1.success === false) &&
-            (!response2.ok || data2.success === false)
-          ) {
-            console.warn("Both Web3Forms submissions failed.");
-            fallbackToMailClient();
-            return;
-          }
-
-          // Show elegant success modal
-
-          showGuestQR(guestName, companionsVal);
-          // Reset the RSVP form state
-          form.reset();
-          resetFormCounter();
-        } catch (error) {
-          console.error("Error submitting RSVP:", error);
-
-          // Fallback to mail client if the send request fails.
-          fallbackToMailClient();
-        } finally {
-          // Restore submit button state
-          btnSubmit.disabled = false;
-          btnSubmit.classList.remove("opacity-75", "cursor-not-allowed");
-          btnSubmitText.innerHTML = `
-                  
-                    <span>سأحضر</span>
-                `;
+        } catch (err) {
+          console.error(err);
+          alert("حدث خطأ أثناء إنشاء مجلد الصور.");
         }
       }
-      function showGuestQR(name, companions) {
-        const qrDiv = document.getElementById("guest-qr");
-        qrDiv.innerHTML = `
-          <a
-            href="https://photos.app.goo.gl/VmWsrwUvqKvJkBy18"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] hover:from-[#2e476d] hover:to-[#57709f] text-white font-cairo py-3 rounded-2xl shadow-md transition-all duration-300 text-sm font-semibold"
-          >
-            رفع الصور
-          </a>
-        `;
 
-        console.log("RSVP confirmed for:", name, "companions:", companions);
-        showModal("success-modal");
-      }
       async function submitApology() {
         const guestName = document.getElementById("guest-name").value.trim();
-        const companionsVal = document.getElementById("companions-input").value;
-        const form = document.getElementById("rsvp-form");
-
         if (!guestName) {
           alert("من فضلك أدخل اسمك أولاً.");
           document.getElementById("guest-name").focus();
           return;
         }
-
+        const form = document.getElementById("rsvp-form");
         const subject = "اعتذار عن حضور زفاف محمد وسارة";
-
-        const messageBody = `مرحباً محمد وسارة،
-
-للأسف لن أتمكن من حضور حفل الزفاف.
-
-الاسم: ${guestName}
-عدد المرافقين: ${companionsVal}
-
-أتمنى لكم حياة سعيدة مليئة بالحب والفرح.`;
-
-        function fallbackToMailClient() {
-          const mailtoUrl = `mailto:mariamatef353@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageBody)}`;
-          window.location.href = mailtoUrl;
-
+        const messageBody = `مرحباً محمد وسارة،\n\nللأسف لن أتمكن من حضور حفل الزفاف.\nالاسم: ${guestName}\nعدد المرافقين: ${document.getElementById("companions-input").value}\nأتمنى لكم حياة سعيدة مليئة بالحب والفرح.`;
+        function fallback() {
+          window.location.href = `mailto:mariamatef353@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageBody)}`;
           showModal("apology-modal");
           form.reset();
           resetFormCounter();
         }
-
         try {
-          // First account
-          const formData1 = new FormData(form);
-          formData1.set("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
-          formData1.set("subject", subject);
-          formData1.append("message", messageBody);
-
-          // Second account
-          const formData2 = new FormData(form);
-          formData2.set("access_key", "70196fed-cfe6-49e8-ac4c-7b86e7c3eaec");
-          formData2.set("subject", subject);
-          formData2.append("message", messageBody);
-
-          const [response1, response2] = await Promise.all([
-            fetch("https://api.web3forms.com/submit", {
-              method: "POST",
-              body: formData1,
-              headers: {
-                Accept: "application/json",
-              },
-            }),
-            fetch("https://api.web3forms.com/submit", {
-              method: "POST",
-              body: formData2,
-              headers: {
-                Accept: "application/json",
-              },
-            }),
-          ]);
-
-          const data1 = await response1.json();
-          const data2 = await response2.json();
-
-          if (
-            (!response1.ok || data1.success === false) &&
-            (!response2.ok || data2.success === false)
-          ) {
-            fallbackToMailClient();
+          const formData = new FormData(form);
+          formData.set("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
+          formData.set("subject", subject);
+          formData.append("message", messageBody);
+          const res = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: formData,
+            headers: { Accept: "application/json" },
+          });
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            fallback();
             return;
           }
-
           showModal("apology-modal");
           form.reset();
           resetFormCounter();
         } catch (err) {
           console.error(err);
-          fallbackToMailClient();
+          fallback();
         }
       }
+
       function resetFormCounter() {
         companions = 0;
         compDisplay.innerText = "0";
@@ -1455,21 +1135,65 @@
         btnMinus.classList.add("cursor-not-allowed", "opacity-50");
       }
 
-      // Apology triggers polite modal
-      function showApologyModal() {
-        showModal("apology-modal");
+      // ----------------------------------------------------
+      // UPLOAD PHOTOS (footer) - GENERATES QR CODE
+      // ----------------------------------------------------
+      function openUploadModal() {
+        document.getElementById("upload-guest-name").value = "";
+        // Clear previous QR
+        document.getElementById("qr-code-container").innerHTML = "";
+        // document.getElementById("qr-folder-link").innerText = "";
+        showModal("upload-modal");
       }
 
-      // Modal Management utilities
+      async function handleUploadPhotos() {
+        const guestName = document
+          .getElementById("upload-guest-name")
+          .value.trim();
+        if (!guestName) {
+          alert("من فضلك أدخل اسمك.");
+          return;
+        }
+        try {
+          const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ guestName: guestName }),
+          });
+          const data = await response.json();
+          if (data.uploadUrl) {
+            // Generate QR code inside the modal
+            const qrContainer = document.getElementById("qr-code-container");
+            qrContainer.innerHTML = ""; // clear previous
+            // Use QRCode.js to generate QR
+            new QRCode(qrContainer, {
+              text: data.uploadUrl,
+              width: 140,
+              height: 140,
+              colorDark: "#2e476d",
+              colorLight: "#ffffff",
+              correctLevel: QRCode.CorrectLevel.H,
+            });
+            // Show link text
+            // document.getElementById("qr-folder-link").innerText =
+            //   "📁 رابط المجلد: " + data.uploadUrl;
+          } else {
+            alert("تم إنشاء المجلد ولكن حدث خطأ في الرابط.");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("حدث خطأ أثناء إنشاء المجلد. تأكد من اتصال الإنترنت.");
+        }
+      }
+
+      // ----------------------------------------------------
+      // MODAL HELPERS
+      // ----------------------------------------------------
       function showModal(id) {
         const modal = document.getElementById(id);
         modal.classList.remove("hidden");
         modal.classList.add("flex");
-        setTimeout(() => {
-          modal.classList.add("opacity-100");
-        }, 10);
+        setTimeout(() => modal.classList.add("opacity-100"), 10);
       }
-
       function closeModal(id) {
         const modal = document.getElementById(id);
         modal.classList.remove("opacity-100");
@@ -1479,28 +1203,31 @@
         }, 300);
       }
 
-      // Scroll Reveal Animation with Intersection Observer
-      document.addEventListener("DOMContentLoaded", () => {
-        const revealElements = document.querySelectorAll(".scroll-reveal");
-
-        const observerOptions = {
-          root: null, // viewport
-          rootMargin: "0px",
-          threshold: 0.12, // Trigger slightly earlier (12% visibility) for responsive feel
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("visible");
-              observer.unobserve(entry.target);
-            }
-          });
-        }, observerOptions);
-
-        revealElements.forEach((el) => {
-          observer.observe(el);
+      // close upload modal on outside click
+      document
+        .getElementById("upload-modal")
+        ?.addEventListener("click", function (e) {
+          if (e.target === this) closeModal("upload-modal");
         });
+
+      // ----------------------------------------------------
+      // SCROLL REVEAL
+      // ----------------------------------------------------
+      document.addEventListener("DOMContentLoaded", () => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { root: null, rootMargin: "0px", threshold: 0.12 },
+        );
+        document
+          .querySelectorAll(".scroll-reveal")
+          .forEach((el) => observer.observe(el));
       });
     </script>
   </body>
