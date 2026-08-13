@@ -1126,15 +1126,19 @@
       //     fallback();
       //   }
       // }
+      const WEB3FORMS_ACCESS_KEY = "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8";
       async function submitRSVP(event) {
         event.preventDefault();
 
         const form = document.getElementById("rsvp-form");
+
         const guestName = document.getElementById("guest-name").value.trim();
+
         const companions = document.getElementById("companions-input").value;
 
         if (!guestName) {
           alert("من فضلك أدخل اسمك.");
+          document.getElementById("guest-name").focus();
           return;
         }
 
@@ -1147,17 +1151,21 @@
         try {
           const formData = new FormData();
 
-          formData.append("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
+          // Web3Forms Access Key
+          formData.append("access_key", WEB3FORMS_ACCESS_KEY);
 
-          formData.append(
-            "email",
-            "mariamatef353@gmail.com,misrShoryanElataa@gmail.com",
-          );
+          // Main recipient
+          formData.append("email", "mariamatef353@gmail.com");
 
+          // Second recipient
+          formData.append("ccemail", "misrShoryanElataa@gmail.com");
+
+          // Email information
           formData.append("subject", "تأكيد حضور - زفاف محمد وسارة");
 
           formData.append("from_name", "Wedding Website RSVP");
 
+          // Guest information
           formData.append("name", guestName);
 
           formData.append("companions", companions);
@@ -1179,12 +1187,13 @@
 
           const data = await response.json();
 
-          console.log("Web3Forms RSVP:", data);
+          console.log("RSVP Web3Forms response:", data);
 
           if (!data.success) {
             throw new Error(data.message || "Web3Forms submission failed");
           }
 
+          // Success
           showModal("success-modal");
 
           form.reset();
@@ -1212,17 +1221,21 @@
         try {
           const formData = new FormData();
 
-          formData.append("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
+          // Web3Forms Access Key
+          formData.append("access_key", WEB3FORMS_ACCESS_KEY);
 
-          formData.append(
-            "email",
-            "mariamatef353@gmail.com,misrShoryanElataa@gmail.com",
-          );
+          // Main recipient
+          formData.append("email", "mariamatef353@gmail.com");
 
+          // Second recipient
+          formData.append("ccemail", "misrShoryanElataa@gmail.com");
+
+          // Email information
           formData.append("subject", "اعتذار عن حضور زفاف محمد وسارة");
 
           formData.append("from_name", "Wedding Website RSVP");
 
+          // Guest information
           formData.append("name", guestName);
 
           formData.append("companions", companions);
@@ -1244,15 +1257,17 @@
 
           const data = await response.json();
 
-          console.log("Web3Forms apology:", data);
+          console.log("Apology Web3Forms response:", data);
 
           if (!data.success) {
             throw new Error(data.message || "Web3Forms submission failed");
           }
 
+          // Success
           showModal("apology-modal");
 
           document.getElementById("rsvp-form").reset();
+
           resetFormCounter();
         } catch (error) {
           console.error("Apology error:", error);
