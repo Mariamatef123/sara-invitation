@@ -821,7 +821,7 @@
       // GLOBALS
       // ----------------------------------------------------
       const APPS_SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbyWeROgKPYiTvFpfe4STUn02cdJF6mQcqDKThHVioW7kje5MxYhuCu6380GGSCwnqXR8w/exec";
+        "https://script.google.com/macros/s/AKfycbzIxDY4c8ggEML3dYa2v0zeMiyE8b6lwPznVMxkrpG9xWKXmv5DI_En9O6rNTKV7OpSzQ/exec";
       let invitationOpened = false;
       let videoSkipped = false;
 
@@ -1077,11 +1077,8 @@
 
         const data = {
           action: action,
-
           guestName: guestName,
-
           companions: companions,
-
           submissionId: submissionId,
         };
 
@@ -1111,6 +1108,8 @@
               provider: "apps-script",
 
               duplicate: result.duplicate || false,
+
+              totalGuests: result.totalGuests || 0,
             };
           }
 
@@ -1123,6 +1122,42 @@
           // ========================================
 
           try {
+            // ----------------------------------------
+            // Get current TOTAL_GUESTS
+            // ----------------------------------------
+
+            let totalGuests = 0;
+
+            try {
+              const counterResponse = await fetch(
+                APPS_SCRIPT_URL + "?action=counter",
+              );
+
+              const counterResult = await counterResponse.json();
+
+              if (counterResult.success) {
+                totalGuests = Number(counterResult.totalGuests || 0);
+              }
+            } catch (counterError) {
+              console.error("Could not get guest counter:", counterError);
+            }
+
+            // ----------------------------------------
+            // Calculate fallback total
+            // ----------------------------------------
+
+            const peopleCount = 1 + Number(companions || 0);
+
+            if (action === "rsvp") {
+              totalGuests = totalGuests + peopleCount;
+            } else if (action === "apology") {
+              totalGuests = Math.max(0, totalGuests - peopleCount);
+            }
+
+            // ----------------------------------------
+            // Email
+            // ----------------------------------------
+
             const subject =
               action === "rsvp"
                 ? "💍 تأكيد حضور - زفاف محمد وسارة"
@@ -1130,17 +1165,27 @@
 
             const message =
               action === "rsvp"
-                ? createFallbackRSVPMessage(guestName, companions)
-                : createFallbackApologyMessage(guestName, companions);
+                ? createFallbackRSVPMessage(guestName, companions, totalGuests)
+                : createFallbackApologyMessage(
+                    guestName,
+                    companions,
+                    totalGuests,
+                  );
 
             await sendWeb3Forms(WEB3FORMS_KEY_1, subject, message);
 
-            // await sendWeb3Forms(WEB3FORMS_KEY_2, subject, message);
+            // await sendWeb3Forms(
+            //   WEB3FORMS_KEY_2,
+            //   subject,
+            //   message
+            // );
 
             return {
               success: true,
 
               provider: "web3forms",
+
+              totalGuests: totalGuests,
             };
           } catch (web3Error) {
             console.error("Web3Forms fallback failed:", web3Error);
@@ -1182,46 +1227,80 @@
 
         return result;
       }
-      function createFallbackRSVPMessage(guestName, companions) {
+      function createFallbackRSVPMessage(guestName, companions, totalGuests) {
+        const total = 1 + Number(companions || 0);
+
         return `
+
 زفاف محمد وسارة
 
 تم تأكيد حضور ضيف جديد.
 
-الاسم: ${guestName}
+الاسم:
+${guestName}
 
-عدد المرافقين: ${companions}
+عدد المرافقين:
+${companions}
 
-التاريخ: السبت، 10 أكتوبر 2026
+إجمالي الأشخاص في هذا الطلب:
+${total}
 
-الوقت: 3:00 مساءً — 6:00 مساءً
-المكان: القاعة الذهبيه بدار المدراعات مدينه نصر
+إجمالي الحضور المسجل حتى الآن:
+${totalGuests}
+
+التاريخ:
+السبت، 10 أكتوبر 2026
+
+الوقت:
+3:00 مساءً — 6:00 مساءً
+
+المكان:
+القاعة الذهبية بدار المدرعات مدينة نصر
 
 نتطلع لرؤيتكم ومشاركتكم فرحتنا.
 
 محمد & سارة
+
 `;
       }
+      function createFallbackApologyMessage(
+        guestName,
+        companions,
+        totalGuests,
+      ) {
+        const total = 1 + Number(companions || 0);
 
-      function createFallbackApologyMessage(guestName, companions) {
         return `
+
 زفاف محمد وسارة
 
 تم تسجيل اعتذار ضيف عن حضور حفل الزفاف.
 
-الاسم: ${guestName}
+الاسم:
+${guestName}
 
-عدد المرافقين: ${companions}
+عدد المرافقين:
+${companions}
 
-التاريخ: السبت، 10 أكتوبر 2026
+إجمالي الأشخاص في هذا الطلب:
+${total}
 
-الوقت: 3:00 مساءً — 6:00 مساءً
+إجمالي الحضور المسجل حتى الآن:
+${totalGuests}
 
-المكان: القاعة الذهبيه بدار المدراعات مدينه نصر
+التاريخ:
+السبت، 10 أكتوبر 2026
+
+الوقت:
+3:00 مساءً — 6:00 مساءً
+
+المكان:
+القاعة الذهبية بدار المدرعات مدينة نصر
 
 نتمنى لكم دوام السعادة والمحبة.
 
 محمد & سارة
+
 `;
       }
       async function submitRSVP(event) {
@@ -1322,6 +1401,7 @@
           alert("حدث خطأ أثناء إرسال الاعتذار. من فضلك حاول مرة أخرى.");
         }
       }
+
       function resetFormCounter() {
         companions = 0;
         compDisplay.innerText = "0";
