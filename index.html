@@ -1342,49 +1342,69 @@
       }
 
       async function handleUploadPhotos() {
-        const guestName = document
-          .getElementById("upload-guest-name")
-          .value.trim();
+        const input = document.getElementById("upload-guest-name");
+
+        const qrContainer = document.getElementById("qr-code-container");
+
+        const guestName = input.value.trim();
 
         if (!guestName) {
           alert("من فضلك أدخل اسمك.");
+
+          input.focus();
+
           return;
         }
 
-        const qrContainer = document.getElementById("qr-code-container");
+        // Clear old QR
 
         qrContainer.innerHTML = "";
 
         try {
-          const formData = new URLSearchParams();
-
-          formData.append("action", "upload");
-          formData.append("guestName", guestName);
-          formData.append("submissionId", generateSubmissionId());
+          console.log("Creating folder for:", guestName);
 
           const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
-            body: formData,
+
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8",
+            },
+
+            body: JSON.stringify({
+              action: "upload",
+
+              guestName: guestName,
+            }),
           });
 
-          const text = await response.text();
+          console.log("HTTP status:", response.status);
 
-          console.log("Apps Script raw response:", text);
+          // ------------------------------------------
+          // Read response as TEXT first
+          // This prevents:
+          // Unexpected token '<'
+          // ------------------------------------------
+
+          const responseText = await response.text();
+
+          console.log("Apps Script response:", responseText);
 
           let data;
 
           try {
-            data = JSON.parse(text);
-          } catch (parseError) {
-            console.error("Apps Script returned non-JSON:", text);
+            data = JSON.parse(responseText);
+          } catch (jsonError) {
+            console.error("Invalid JSON:", responseText);
 
-            throw new Error("Google Apps Script returned an invalid response.");
+            throw new Error("Apps Script returned something other than JSON.");
           }
 
-          console.log("Apps Script upload response:", data);
+          // ------------------------------------------
+          // Check success
+          // ------------------------------------------
 
           if (!data.success) {
-            throw new Error(data.error || "Failed to create folder.");
+            throw new Error(data.error || "Could not create folder.");
           }
 
           if (!data.uploadUrl) {
@@ -1393,21 +1413,51 @@
             );
           }
 
+          console.log("Folder URL:", data.uploadUrl);
+
+          // ------------------------------------------
           // Generate QR
+          // ------------------------------------------
+
           new QRCode(qrContainer, {
             text: data.uploadUrl,
+
             width: 180,
+
             height: 180,
+
             colorDark: "#2e476d",
+
             colorLight: "#ffffff",
+
             correctLevel: QRCode.CorrectLevel.H,
           });
 
-          console.log("Folder created:", data.uploadUrl);
+          // ------------------------------------------
+          // Optional success message
+          // ------------------------------------------
+
+          const oldMessage = document.getElementById("qr-success-message");
+
+          if (oldMessage) {
+            oldMessage.remove();
+          }
+
+          const message = document.createElement("p");
+
+          message.id = "qr-success-message";
+
+          message.className =
+            "font-cairo text-andalusia-darkgold text-xs mt-2 leading-relaxed";
+
+          message.innerHTML =
+            "تم إنشاء مجلدك بنجاح 💙<br>امسح رمز QR لرفع الصور.";
+
+          qrContainer.after(message);
         } catch (error) {
           console.error("Upload folder error:", error);
 
-          alert("حدث خطأ أثناء إنشاء مجلد الصور. من فضلك حاول مرة أخرى.");
+          alert("حدث خطأ أثناء إنشاء المجلد.\n\n" + error.message);
         }
       }
       // ----------------------------------------------------
