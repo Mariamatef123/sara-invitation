@@ -821,7 +821,7 @@
       // GLOBALS
       // ----------------------------------------------------
       const APPS_SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbzD3uZdaIGPMNhSffORSSPCEXyNE22CmsjjUwIg94Gu7hbin7AiI1M0YK5JcVh8vXMZ/exec";
+        "https://script.google.com/macros/s/AKfycbz4bapqKQAn80z7IVxF0PbSlkIvhPOJy-IF1nOIDC7cRuNGMsOJwb6bq1oKoInQ7iMuiQ/exec";
       let invitationOpened = false;
       let videoSkipped = false;
 
@@ -1063,70 +1063,158 @@
         }
       }
 
+      // async function submitRSVP(event) {
+      //   event.preventDefault();
+      //   const form = document.getElementById("rsvp-form");
+      //   const guestName = document.getElementById("guest-name").value.trim();
+      //   const companionsVal = document.getElementById("companions-input").value;
+      //   if (!guestName) return;
+      //   try {
+      //     const response = await fetch(APPS_SCRIPT_URL, {
+      //       method: "POST",
+      //       body: JSON.stringify({ guestName: guestName }),
+      //     });
+      //     const data = await response.json();
+      //     // // const qrDiv = document.getElementById("guest-qr");
+      //     // qrDiv.innerHTML = `<a href="${data.uploadUrl}" target="_blank" class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] text-white font-cairo py-3 rounded-2xl shadow-md text-sm font-semibold">رفع الصور</a>`;
+
+      //     showModal("success-modal");
+      //     form.reset();
+      //     resetFormCounter();
+      //   } catch (err) {
+      //     console.error(err);
+      //     alert("حدث خطأ أثناء إنشاء مجلد الصور.");
+      //   }
+      // }
+
+      // async function submitApology() {
+      //   const guestName = document.getElementById("guest-name").value.trim();
+      //   if (!guestName) {
+      //     alert("من فضلك أدخل اسمك أولاً.");
+      //     document.getElementById("guest-name").focus();
+      //     return;
+      //   }
+      //   const form = document.getElementById("rsvp-form");
+      //   const subject = "اعتذار عن حضور زفاف محمد وسارة";
+      //   const messageBody = `مرحباً محمد وسارة،\n\nللأسف لن أتمكن من حضور حفل الزفاف.\nالاسم: ${guestName}\nعدد المرافقين: ${document.getElementById("companions-input").value}\nأتمنى لكم حياة سعيدة مليئة بالحب والفرح.`;
+      //   function fallback() {
+      //     window.location.href = `mailto:mariamatef353@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageBody)}`;
+      //     showModal("apology-modal");
+      //     form.reset();
+      //     resetFormCounter();
+      //   }
+      //   try {
+      //     const formData = new FormData(form);
+      //     formData.set("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
+      //     formData.set("subject", subject);
+      //     formData.append("message", messageBody);
+      //     const res = await fetch("https://api.web3forms.com/submit", {
+      //       method: "POST",
+      //       body: formData,
+      //       headers: { Accept: "application/json" },
+      //     });
+      //     const data = await res.json();
+      //     if (!res.ok || !data.success) {
+      //       fallback();
+      //       return;
+      //     }
+      //     showModal("apology-modal");
+      //     form.reset();
+      //     resetFormCounter();
+      //   } catch (err) {
+      //     console.error(err);
+      //     fallback();
+      //   }
+      // }
       async function submitRSVP(event) {
         event.preventDefault();
+
         const form = document.getElementById("rsvp-form");
         const guestName = document.getElementById("guest-name").value.trim();
-        const companionsVal = document.getElementById("companions-input").value;
-        if (!guestName) return;
+        const companions = document.getElementById("companions-input").value;
+
+        if (!guestName) {
+          alert("من فضلك أدخل اسمك.");
+          return;
+        }
+
+        const btn = document.getElementById("btn-submit");
+        const btnText = document.getElementById("btn-submit-text");
+
+        btn.disabled = true;
+        btnText.textContent = "جاري الإرسال...";
+
         try {
           const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
-            body: JSON.stringify({ guestName: guestName }),
+            body: JSON.stringify({
+              action: "rsvp",
+              guestName: guestName,
+              companions: companions,
+            }),
           });
-          const data = await response.json();
-          // // const qrDiv = document.getElementById("guest-qr");
-          // qrDiv.innerHTML = `<a href="${data.uploadUrl}" target="_blank" class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] text-white font-cairo py-3 rounded-2xl shadow-md text-sm font-semibold">رفع الصور</a>`;
 
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error(data.error || "RSVP failed");
+          }
+
+          // Show success modal
           showModal("success-modal");
+
+          // Reset form
           form.reset();
           resetFormCounter();
-        } catch (err) {
-          console.error(err);
-          alert("حدث خطأ أثناء إنشاء مجلد الصور.");
+        } catch (error) {
+          console.error("RSVP error:", error);
+
+          alert("حدث خطأ أثناء إرسال تأكيد الحضور. من فضلك حاول مرة أخرى.");
+        } finally {
+          btn.disabled = false;
+          btnText.textContent = "سأحضر";
         }
       }
-
       async function submitApology() {
         const guestName = document.getElementById("guest-name").value.trim();
+        const companions = document.getElementById("companions-input").value;
+
         if (!guestName) {
           alert("من فضلك أدخل اسمك أولاً.");
           document.getElementById("guest-name").focus();
           return;
         }
+
         const form = document.getElementById("rsvp-form");
-        const subject = "اعتذار عن حضور زفاف محمد وسارة";
-        const messageBody = `مرحباً محمد وسارة،\n\nللأسف لن أتمكن من حضور حفل الزفاف.\nالاسم: ${guestName}\nعدد المرافقين: ${document.getElementById("companions-input").value}\nأتمنى لكم حياة سعيدة مليئة بالحب والفرح.`;
-        function fallback() {
-          window.location.href = `mailto:mariamatef353@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageBody)}`;
-          showModal("apology-modal");
-          form.reset();
-          resetFormCounter();
-        }
+
         try {
-          const formData = new FormData(form);
-          formData.set("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
-          formData.set("subject", subject);
-          formData.append("message", messageBody);
-          const res = await fetch("https://api.web3forms.com/submit", {
+          const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
-            body: formData,
-            headers: { Accept: "application/json" },
+            body: JSON.stringify({
+              action: "apology",
+              guestName: guestName,
+              companions: companions,
+            }),
           });
-          const data = await res.json();
-          if (!res.ok || !data.success) {
-            fallback();
-            return;
+
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error(data.error || "Apology failed");
           }
+
+          // Show apology modal
           showModal("apology-modal");
+
+          // Reset form
           form.reset();
           resetFormCounter();
-        } catch (err) {
-          console.error(err);
-          fallback();
+        } catch (error) {
+          console.error("Apology error:", error);
+
+          alert("حدث خطأ أثناء إرسال الاعتذار. من فضلك حاول مرة أخرى.");
         }
       }
-
       function resetFormCounter() {
         companions = 0;
         compDisplay.innerText = "0";
