@@ -817,822 +817,822 @@
 
     <!-- ========== JAVASCRIPT ========== -->
     <script>
-      // ----------------------------------------------------
-      // GLOBALS
-      // ----------------------------------------------------
-      //const APPS_SCRIPT_URL ="https://script.google.com/macros/s/AKfycbzlxDY4c8ggEML3dYa2v0zeMiyE8b6lwPznVMxkrpG9xWKXmv5Dl_En9O6rNTKV7OpSzQ/exec";
-      let invitationOpened = false;
-      let videoSkipped = false;
+            // ----------------------------------------------------
+            // GLOBALS
+            // ----------------------------------------------------
+            const APPS_SCRIPT_URL ="https://script.google.com/macros/s/AKfycbzlxDY4c8ggEML3dYa2v0zeMiyE8b6lwPznVMxkrpG9xWKXmv5Dl_En9O6rNTKV7OpSzQ/exec";
+            let invitationOpened = false;
+            let videoSkipped = false;
 
-      // ----------------------------------------------------
-      // COVER / ENVELOPE
-      // ----------------------------------------------------
-      async function openInvitation() {
-        if (invitationOpened) return;
-        invitationOpened = true;
-        const cover = document.getElementById("cover-screen");
-        cover.classList.add("opacity-0");
-        setTimeout(() => cover.classList.add("hidden"), 1000);
-        const envScreen = document.getElementById("envelope-screen");
-        envScreen.classList.remove("hidden");
-        envScreen.classList.add("flex");
-        const loader = document.getElementById("video-loader");
-        const video = document.getElementById("cinematic-video");
-        if (!video) {
-          revealMainContent();
-          return;
-        }
-        function updateVideoFit() {
-          video.style.objectFit =
-            window.innerWidth >= 1024 ? "contain" : "cover";
-        }
-        updateVideoFit();
-        window.addEventListener("resize", updateVideoFit);
-        let finished = false;
-        function finish() {
-          if (finished || videoSkipped) return;
-          finished = true;
-          clearTimeout(timeout);
-          video.pause();
-          revealMainContent();
-        }
-        video.pause();
-        video.currentTime = 0;
-        loader.style.display = "flex";
-        loader.textContent = "Loading...";
-        video.src = "0812 (1).mp4";
-        video.load();
-        video.onwaiting = () => {
-          loader.style.display = "flex";
-          loader.textContent = "Loading...";
-        };
-        video.onplaying = () => {
-          loader.style.display = "none";
-        };
-        video.oncanplaythrough = async () => {
-          if (videoSkipped) return;
-          try {
-            await video.play();
-          } catch (err) {
-            console.error(err);
-            finish();
-          }
-        };
-        video.onended = finish;
-        video.onerror = finish;
-        const timeout = setTimeout(() => {
-          console.log("Video timeout");
-          finish();
-        }, 60000);
-      }
+            // ----------------------------------------------------
+            // COVER / ENVELOPE
+            // ----------------------------------------------------
+            async function openInvitation() {
+              if (invitationOpened) return;
+              invitationOpened = true;
+              const cover = document.getElementById("cover-screen");
+              cover.classList.add("opacity-0");
+              setTimeout(() => cover.classList.add("hidden"), 1000);
+              const envScreen = document.getElementById("envelope-screen");
+              envScreen.classList.remove("hidden");
+              envScreen.classList.add("flex");
+              const loader = document.getElementById("video-loader");
+              const video = document.getElementById("cinematic-video");
+              if (!video) {
+                revealMainContent();
+                return;
+              }
+              function updateVideoFit() {
+                video.style.objectFit =
+                  window.innerWidth >= 1024 ? "contain" : "cover";
+              }
+              updateVideoFit();
+              window.addEventListener("resize", updateVideoFit);
+              let finished = false;
+              function finish() {
+                if (finished || videoSkipped) return;
+                finished = true;
+                clearTimeout(timeout);
+                video.pause();
+                revealMainContent();
+              }
+              video.pause();
+              video.currentTime = 0;
+              loader.style.display = "flex";
+              loader.textContent = "Loading...";
+              video.src = "0812 (1).mp4";
+              video.load();
+              video.onwaiting = () => {
+                loader.style.display = "flex";
+                loader.textContent = "Loading...";
+              };
+              video.onplaying = () => {
+                loader.style.display = "none";
+              };
+              video.oncanplaythrough = async () => {
+                if (videoSkipped) return;
+                try {
+                  await video.play();
+                } catch (err) {
+                  console.error(err);
+                  finish();
+                }
+              };
+              video.onended = finish;
+              video.onerror = finish;
+              const timeout = setTimeout(() => {
+                console.log("Video timeout");
+                finish();
+              }, 60000);
+            }
 
-      function skipEnvelopeAnimation() {
-        videoSkipped = true;
-        const video = document.getElementById("cinematic-video");
-        if (video) {
-          video.pause();
-          video.currentTime = 0;
-          video.onended = null;
-          video.onerror = null;
-          video.onwaiting = null;
-          video.onplaying = null;
-          video.oncanplay = null;
-        }
-        revealMainContent();
-      }
+            function skipEnvelopeAnimation() {
+              videoSkipped = true;
+              const video = document.getElementById("cinematic-video");
+              if (video) {
+                video.pause();
+                video.currentTime = 0;
+                video.onended = null;
+                video.onerror = null;
+                video.onwaiting = null;
+                video.onplaying = null;
+                video.oncanplay = null;
+              }
+              revealMainContent();
+            }
 
-      function revealMainContent() {
-        if (window.cinematicTimeouts) {
-          window.cinematicTimeouts.forEach((t) => clearTimeout(t));
-        }
-        const cover = document.getElementById("cover-screen");
-        const envScreen = document.getElementById("envelope-screen");
-        const mainContent = document.getElementById("main-content");
-        cover.classList.add("hidden");
-        envScreen.classList.add("opacity-0");
-        setTimeout(() => {
-          envScreen.classList.add("hidden");
-          envScreen.classList.remove("flex");
-          mainContent.classList.remove("hidden");
-          mainContent.style.opacity = "0";
-          setTimeout(() => {
-            mainContent.style.opacity = "1";
-          }, 50);
-        }, 800);
-      }
+            function revealMainContent() {
+              if (window.cinematicTimeouts) {
+                window.cinematicTimeouts.forEach((t) => clearTimeout(t));
+              }
+              const cover = document.getElementById("cover-screen");
+              const envScreen = document.getElementById("envelope-screen");
+              const mainContent = document.getElementById("main-content");
+              cover.classList.add("hidden");
+              envScreen.classList.add("opacity-0");
+              setTimeout(() => {
+                envScreen.classList.add("hidden");
+                envScreen.classList.remove("flex");
+                mainContent.classList.remove("hidden");
+                mainContent.style.opacity = "0";
+                setTimeout(() => {
+                  mainContent.style.opacity = "1";
+                }, 50);
+              }, 800);
+            }
 
-      // ----------------------------------------------------
-      // SPARKLES
-      // ----------------------------------------------------
-      const canvas = document.getElementById("sparkles-canvas");
-      const ctx = canvas.getContext("2d");
-      let particles = [];
-      function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      window.addEventListener("resize", resizeCanvas);
-      resizeCanvas();
-      class Sparkle {
-        constructor() {
-          this.x = Math.random() * canvas.width;
-          this.y = canvas.height + Math.random() * 100;
-          this.size = Math.random() * 2.2 + 0.6;
-          this.speedY = Math.random() * 0.6 + 0.12;
-          this.speedX = Math.random() * 0.25 - 0.125;
-          this.opacity = Math.random() * 0.4 + 0.2;
-          this.fade = Math.random() * 0.002 + 0.001;
-        }
-        update() {
-          this.y -= this.speedY;
-          this.x += this.speedX;
-          this.opacity -= this.fade;
-          if (this.opacity <= 0 || this.y < -10) {
-            this.x = Math.random() * canvas.width;
-            this.y = canvas.height + 10;
-            this.size = Math.random() * 2.2 + 0.6;
-            this.speedY = Math.random() * 0.6 + 0.12;
-            this.speedX = Math.random() * 0.25 - 0.125;
-            this.opacity = Math.random() * 0.4 + 0.2;
-          }
-        }
-        draw() {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(111, 132, 170, ${this.opacity})`;
-          ctx.shadowBlur = 5;
-          ctx.shadowColor = "#6f84aa";
-          ctx.fill();
-        }
-      }
-      for (let i = 0; i < Math.min(35, Math.floor(window.innerWidth / 20)); i++)
-        particles.push(new Sparkle());
-      function animateSparkles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let p of particles) {
-          p.update();
-          p.draw();
-        }
-        requestAnimationFrame(animateSparkles);
-      }
-      animateSparkles();
+            // ----------------------------------------------------
+            // SPARKLES
+            // ----------------------------------------------------
+            const canvas = document.getElementById("sparkles-canvas");
+            const ctx = canvas.getContext("2d");
+            let particles = [];
+            function resizeCanvas() {
+              canvas.width = window.innerWidth;
+              canvas.height = window.innerHeight;
+            }
+            window.addEventListener("resize", resizeCanvas);
+            resizeCanvas();
+            class Sparkle {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 2.2 + 0.6;
+                this.speedY = Math.random() * 0.6 + 0.12;
+                this.speedX = Math.random() * 0.25 - 0.125;
+                this.opacity = Math.random() * 0.4 + 0.2;
+                this.fade = Math.random() * 0.002 + 0.001;
+              }
+              update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                this.opacity -= this.fade;
+                if (this.opacity <= 0 || this.y < -10) {
+                  this.x = Math.random() * canvas.width;
+                  this.y = canvas.height + 10;
+                  this.size = Math.random() * 2.2 + 0.6;
+                  this.speedY = Math.random() * 0.6 + 0.12;
+                  this.speedX = Math.random() * 0.25 - 0.125;
+                  this.opacity = Math.random() * 0.4 + 0.2;
+                }
+              }
+              draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(111, 132, 170, ${this.opacity})`;
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = "#6f84aa";
+                ctx.fill();
+              }
+            }
+            for (let i = 0; i < Math.min(35, Math.floor(window.innerWidth / 20)); i++)
+              particles.push(new Sparkle());
+            function animateSparkles() {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              for (let p of particles) {
+                p.update();
+                p.draw();
+              }
+              requestAnimationFrame(animateSparkles);
+            }
+            animateSparkles();
 
-      // ----------------------------------------------------
-      // COUNTDOWN
-      // ----------------------------------------------------
-      const targetDate = new Date("October 10, 2026 15:00:00").getTime();
-      function updateCountdown() {
-        const now = new Date().getTime();
-        const diff = targetDate - now;
-        if (diff <= 0) {
-          document.getElementById("timer-days").innerText = "0";
-          document.getElementById("timer-hours").innerText = "0";
-          document.getElementById("timer-minutes").innerText = "0";
-          document.getElementById("timer-seconds").innerText = "0";
-          return;
-        }
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-        );
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        document.getElementById("timer-days").innerText = days;
-        document.getElementById("timer-hours").innerText =
-          hours < 10 ? "0" + hours : hours;
-        document.getElementById("timer-minutes").innerText =
-          minutes < 10 ? "0" + minutes : minutes;
-        document.getElementById("timer-seconds").innerText =
-          seconds < 10 ? "0" + seconds : seconds;
-      }
-      setInterval(updateCountdown, 1000);
-      updateCountdown();
+            // ----------------------------------------------------
+            // COUNTDOWN
+            // ----------------------------------------------------
+            const targetDate = new Date("October 10, 2026 15:00:00").getTime();
+            function updateCountdown() {
+              const now = new Date().getTime();
+              const diff = targetDate - now;
+              if (diff <= 0) {
+                document.getElementById("timer-days").innerText = "0";
+                document.getElementById("timer-hours").innerText = "0";
+                document.getElementById("timer-minutes").innerText = "0";
+                document.getElementById("timer-seconds").innerText = "0";
+                return;
+              }
+              const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+              const hours = Math.floor(
+                (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+              );
+              const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+              document.getElementById("timer-days").innerText = days;
+              document.getElementById("timer-hours").innerText =
+                hours < 10 ? "0" + hours : hours;
+              document.getElementById("timer-minutes").innerText =
+                minutes < 10 ? "0" + minutes : minutes;
+              document.getElementById("timer-seconds").innerText =
+                seconds < 10 ? "0" + seconds : seconds;
+            }
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
 
-      // ----------------------------------------------------
-      // CALENDAR
-      // ----------------------------------------------------
-      const eventTitle = "زفاف محمد وسارة";
-      const eventLocation = "دار المدرعات مدينه نصر";
-      const eventDescription =
-        "يسعدنا ويشرفنا حضوركم حفل زفافنا في دار المدرعات مدينه نصر ومشاركتنا بهجة هذا اليوم السعيد.";
-      const startISO = "20261010T150000";
-      const endISO = "20261010T180000";
-      document.getElementById("btn-google-cal").href =
-        `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startISO}/${endISO}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
-      function downloadAppleCalendar() {
-        const ics =
-          "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Andalusian Wedding Invitation//EN\r\nBEGIN:VEVENT\r\nUID:wedding-mohamed-sara-2026@nfrah\r\nDTSTAMP:20260620T120000Z\r\nDTSTART;TZID=GMT+3:" +
-          startISO +
-          "\r\nDTEND;TZID=GMT+3:" +
-          endISO +
-          "\r\nSUMMARY:" +
-          eventTitle +
-          "\r\nDESCRIPTION:" +
-          eventDescription +
-          "\r\nLOCATION:" +
-          eventLocation +
-          "\r\nEND:VEVENT\r\nEND:VCALENDAR";
-        const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = "wedding-invitation.ics";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+            // ----------------------------------------------------
+            // CALENDAR
+            // ----------------------------------------------------
+            const eventTitle = "زفاف محمد وسارة";
+            const eventLocation = "دار المدرعات مدينه نصر";
+            const eventDescription =
+              "يسعدنا ويشرفنا حضوركم حفل زفافنا في دار المدرعات مدينه نصر ومشاركتنا بهجة هذا اليوم السعيد.";
+            const startISO = "20261010T150000";
+            const endISO = "20261010T180000";
+            document.getElementById("btn-google-cal").href =
+              `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startISO}/${endISO}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
+            function downloadAppleCalendar() {
+              const ics =
+                "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Andalusian Wedding Invitation//EN\r\nBEGIN:VEVENT\r\nUID:wedding-mohamed-sara-2026@nfrah\r\nDTSTAMP:20260620T120000Z\r\nDTSTART;TZID=GMT+3:" +
+                startISO +
+                "\r\nDTEND;TZID=GMT+3:" +
+                endISO +
+                "\r\nSUMMARY:" +
+                eventTitle +
+                "\r\nDESCRIPTION:" +
+                eventDescription +
+                "\r\nLOCATION:" +
+                eventLocation +
+                "\r\nEND:VEVENT\r\nEND:VCALENDAR";
+              const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+              const link = document.createElement("a");
+              link.href = window.URL.createObjectURL(blob);
+              link.download = "wedding-invitation.ics";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }
 
-      // ----------------------------------------------------
-      // RSVP / COMPANIONS
-      // ----------------------------------------------------
-      let companions = 0;
-      const compDisplay = document.getElementById("companions-display");
-      const compInput = document.getElementById("companions-input");
-      const btnMinus = document.getElementById("btn-minus");
-      function changeCompanions(amount) {
-        companions += amount;
-        if (companions < 0) companions = 0;
-        compDisplay.innerText = companions;
-        compInput.value = companions;
-        if (companions === 0) {
-          btnMinus.disabled = true;
-          btnMinus.classList.add("cursor-not-allowed", "opacity-50");
-        } else {
-          btnMinus.disabled = false;
-          btnMinus.classList.remove("cursor-not-allowed", "opacity-50");
-        }
-      }
+            // ----------------------------------------------------
+            // RSVP / COMPANIONS
+            // ----------------------------------------------------
+            let companions = 0;
+            const compDisplay = document.getElementById("companions-display");
+            const compInput = document.getElementById("companions-input");
+            const btnMinus = document.getElementById("btn-minus");
+            function changeCompanions(amount) {
+              companions += amount;
+              if (companions < 0) companions = 0;
+              compDisplay.innerText = companions;
+              compInput.value = companions;
+              if (companions === 0) {
+                btnMinus.disabled = true;
+                btnMinus.classList.add("cursor-not-allowed", "opacity-50");
+              } else {
+                btnMinus.disabled = false;
+                btnMinus.classList.remove("cursor-not-allowed", "opacity-50");
+              }
+            }
 
-      const WEB3FORMS_KEY_1 = "5c7287a4-e222-4944-9c84-011e01025a87";
-      const WEB3FORMS_KEY_2 = "d20d942b-ff9d-4210-b5d5-533c0cb07639";
-      function generateSubmissionId() {
-        return (
-          Date.now().toString() +
-          "-" +
-          Math.random().toString(36).substring(2, 12)
-        );
-      }
-      async function submitWeddingAction({ action, guestName, companions }) {
-        const submissionId = generateSubmissionId();
+            const WEB3FORMS_KEY_1 = "5c7287a4-e222-4944-9c84-011e01025a87";
+            const WEB3FORMS_KEY_2 = "d20d942b-ff9d-4210-b5d5-533c0cb07639";
+            function generateSubmissionId() {
+              return (
+                Date.now().toString() +
+                "-" +
+                Math.random().toString(36).substring(2, 12)
+              );
+            }
+            async function submitWeddingAction({ action, guestName, companions }) {
+              const submissionId = generateSubmissionId();
 
-        const data = {
-          action: action,
-          guestName: guestName,
-          companions: companions,
-          submissionId: submissionId,
-        };
+              const data = {
+                action: action,
+                guestName: guestName,
+                companions: companions,
+                submissionId: submissionId,
+              };
 
-        // ==========================================
-        // PRIMARY: GOOGLE APPS SCRIPT
-        // ==========================================
+              // ==========================================
+              // PRIMARY: GOOGLE APPS SCRIPT
+              // ==========================================
 
-        try {
-          const response = await fetch(APPS_SCRIPT_URL, {
-            method: "POST",
+              // try {
+              //   const response = await fetch(APPS_SCRIPT_URL, {
+              //     method: "POST",
 
-            headers: {
-              "Content-Type": "text/plain;charset=utf-8",
-            },
+              //     headers: {
+              //       "Content-Type": "text/plain;charset=utf-8",
+              //     },
 
-            body: JSON.stringify(data),
-          });
+              //     body: JSON.stringify(data),
+              //   });
 
-          const result = await response.json();
+              //   const result = await response.json();
 
-          console.log("Apps Script result:", result);
+              //   console.log("Apps Script result:", result);
 
-          if (result.success) {
-            return {
-              success: true,
+              //   if (result.success) {
+              //     return {
+              //       success: true,
 
-              provider: "apps-script",
+              //       provider: "apps-script",
 
-              duplicate: result.duplicate || false,
+              //       duplicate: result.duplicate || false,
 
-              // IMPORTANT:
-              // This is the actual TOTAL_GUESTS
-              // stored by Apps Script.
-              totalGuests: Number(result.totalGuests || 0),
-            };
-          }
+              //       // IMPORTANT:
+              //       // This is the actual TOTAL_GUESTS
+              //       // stored by Apps Script.
+              //       totalGuests: Number(result.totalGuests || 0),
+              //     };
+              //   }
 
-          throw new Error(result.error || "Apps Script failed");
-        } catch (appsScriptError) {
-          console.error("Apps Script failed:", appsScriptError);
+              //   throw new Error(result.error || "Apps Script failed");
+              // } catch (appsScriptError) {
+              //   console.error("Apps Script failed:", appsScriptError);
 
-          // ========================================
-          // FALLBACK: WEB3FORMS
-          // ========================================
+                // ========================================
+                // FALLBACK: WEB3FORMS
+                // ========================================
 
-          try {
-            // ----------------------------------------
-            // Get TOTAL_GUESTS from Apps Script
-            // ----------------------------------------
+                try {
+                  // ----------------------------------------
+                  // Get TOTAL_GUESTS from Apps Script
+                  // ----------------------------------------
 
-            let currentTotalGuests = 0;
+                  let currentTotalGuests = 0;
 
-            try {
-              const counterResponse = await fetch(
-                APPS_SCRIPT_URL + "?action=counter",
+                  try {
+                    const counterResponse = await fetch(
+                      APPS_SCRIPT_URL + "?action=counter",
+                    );
+
+                    const counterResult = await counterResponse.json();
+
+                    console.log("Counter result:", counterResult);
+
+                    if (counterResult.success) {
+                      currentTotalGuests = Number(counterResult.totalGuests || 0);
+                    }
+                  } catch (counterError) {
+                    console.error("Could not get TOTAL_GUESTS:", counterError);
+                  }
+
+                  // ----------------------------------------
+                  // Calculate people in this request
+                  // ----------------------------------------
+
+                  const peopleCount = 1 + Number(companions || 0);
+
+                  // ----------------------------------------
+                  // Calculate total for Web3Forms
+                  // ----------------------------------------
+
+                  let totalGuests = currentTotalGuests;
+
+                  if (action === "rsvp") {
+                    totalGuests = currentTotalGuests + peopleCount;
+                  }
+
+                  if (action === "apology") {
+                    totalGuests = Math.max(0, currentTotalGuests - peopleCount);
+                  }
+
+                  console.log("Current TOTAL_GUESTS:", currentTotalGuests);
+
+                  console.log("New TOTAL_GUESTS:", totalGuests);
+
+                  // ----------------------------------------
+                  // Email subject
+                  // ----------------------------------------
+
+                  const subject =
+                    action === "rsvp"
+                      ? "💍 تأكيد حضور - زفاف محمد وسارة"
+                      : "💌 اعتذار عن حضور - زفاف محمد وسارة";
+
+                  // ----------------------------------------
+                  // Email message
+                  // ----------------------------------------
+
+                  const message =
+                    action === "rsvp"
+                      ? createFallbackRSVPMessage(guestName, companions, totalGuests)
+                      : createFallbackApologyMessage(
+                          guestName,
+                          companions,
+                          totalGuests,
+                        );
+
+                  // ----------------------------------------
+                  // Send Web3Forms
+                  // ----------------------------------------
+
+                  await sendWeb3Forms(WEB3FORMS_KEY_1, subject, message);
+
+                  // ----------------------------------------
+                  // Optional second email
+                  // ----------------------------------------
+
+                  // await sendWeb3Forms(
+                  //   WEB3FORMS_KEY_2,
+                  //   subject,
+                  //   message
+                  // );
+
+                  return {
+                    success: true,
+
+                    provider: "web3forms",
+
+                    totalGuests: totalGuests,
+                  };
+                } catch (web3Error) {
+                  console.error("Web3Forms fallback failed:", web3Error);
+
+                  return {
+                    success: false,
+
+                    error: "Both email systems failed.",
+                  };
+                }
+              }
+            }
+            async function sendWeb3Forms(accessKey, subject, message) {
+              const formData = new FormData();
+
+              formData.append("access_key", accessKey);
+
+              formData.append("subject", subject);
+
+              formData.append("from_name", "زفاف محمد وسارة");
+
+              formData.append("name", "Wedding RSVP");
+
+              formData.append("message", message);
+
+              const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+
+                body: formData,
+              });
+
+              const result = await response.json();
+
+              console.log("Web3Forms:", result);
+
+              if (!result.success) {
+                throw new Error(result.message || "Web3Forms failed");
+              }
+
+              return result;
+            }
+            function createFallbackRSVPMessage(guestName, companions, totalGuests) {
+              const total = 1 + Number(companions || 0);
+
+              return `
+
+      زفاف محمد وسارة
+
+      تم تأكيد حضور ضيف جديد.
+
+      الاسم:
+      ${guestName}
+
+      عدد المرافقين:
+      ${companions}
+
+      إجمالي الأشخاص في هذا الطلب:
+      ${total}
+
+      إجمالي الحضور المسجل حتى الآن:
+      ${totalGuests}
+
+      التاريخ:
+      السبت، 10 أكتوبر 2026
+
+      الوقت:
+      3:00 مساءً — 6:00 مساءً
+
+      المكان:
+      القاعة الذهبية بدار المدرعات مدينة نصر
+
+      نتطلع لرؤيتكم ومشاركتكم فرحتنا.
+
+      محمد & سارة
+
+      `;
+            }
+
+            function createFallbackApologyMessage(
+              guestName,
+              companions,
+              totalGuests,
+            ) {
+              const total = 1 + Number(companions || 0);
+
+              return `
+
+      زفاف محمد وسارة
+
+      تم تسجيل اعتذار ضيف عن حضور حفل الزفاف.
+
+      الاسم:
+      ${guestName}
+
+      عدد المرافقين:
+      ${companions}
+
+      إجمالي الأشخاص في هذا الطلب:
+      ${total}
+
+      إجمالي الحضور المسجل حتى الآن:
+      ${totalGuests}
+
+      التاريخ:
+      السبت، 10 أكتوبر 2026
+
+      الوقت:
+      3:00 مساءً — 6:00 مساءً
+
+      المكان:
+      القاعة الذهبية بدار المدرعات مدينة نصر
+
+      نتمنى لكم دوام السعادة والمحبة.
+
+      محمد & سارة
+
+      `;
+            }
+            async function getTotalGuestsFromAppsScript() {
+              try {
+                const response = await fetch(APPS_SCRIPT_URL + "?action=counter");
+
+                const result = await response.json();
+
+                console.log("TOTAL_GUESTS from Apps Script:", result);
+
+                if (!result.success) {
+                  throw new Error(result.error || "Could not get total guests");
+                }
+
+                return Number(result.totalGuests || 0);
+              } catch (error) {
+                console.error("Failed to get TOTAL_GUESTS:", error);
+
+                return 0;
+              }
+            }
+            async function submitRSVP(event) {
+              event.preventDefault();
+
+              const guestName = document.getElementById("guest-name").value.trim();
+
+              const companions = Number(
+                document.getElementById("companions-input").value || 0,
               );
 
-              const counterResult = await counterResponse.json();
+              if (!guestName) {
+                alert("من فضلك أدخل اسمك.");
 
-              console.log("Counter result:", counterResult);
-
-              if (counterResult.success) {
-                currentTotalGuests = Number(counterResult.totalGuests || 0);
+                return;
               }
-            } catch (counterError) {
-              console.error("Could not get TOTAL_GUESTS:", counterError);
+
+              const button = document.getElementById("btn-submit");
+
+              const buttonText = document.getElementById("btn-submit-text");
+
+              if (button) {
+                button.disabled = true;
+              }
+
+              if (buttonText) {
+                buttonText.textContent = "جاري تسجيل الحضور...";
+              }
+
+              try {
+                const result = await submitWeddingAction({
+                  action: "rsvp",
+
+                  guestName: guestName,
+
+                  companions: companions,
+                });
+
+                if (!result.success) {
+                  throw new Error(result.error);
+                }
+
+                console.log("RSVP sent using:", result.provider);
+
+                // Success UI
+
+                showModal("success-modal");
+
+                document.getElementById("rsvp-form")?.reset();
+              } catch (error) {
+                console.error("RSVP error:", error);
+
+                alert("حدث خطأ أثناء إرسال تأكيد الحضور. من فضلك حاول مرة أخرى.");
+              } finally {
+                if (button) {
+                  button.disabled = false;
+                }
+
+                if (buttonText) {
+                  buttonText.textContent = "سأحضر";
+                }
+              }
+            }
+            async function submitApology() {
+              const guestName = document.getElementById("guest-name").value.trim();
+
+              const companions = Number(
+                document.getElementById("companions-input").value || 0,
+              );
+
+              if (!guestName) {
+                alert("من فضلك أدخل اسمك أولاً.");
+
+                return;
+              }
+
+              try {
+                const result = await submitWeddingAction({
+                  action: "apology",
+
+                  guestName: guestName,
+
+                  companions: companions,
+                });
+
+                if (!result.success) {
+                  throw new Error(result.error);
+                }
+
+                console.log("Apology sent using:", result.provider);
+
+                showModal("apology-modal");
+
+                document.getElementById("rsvp-form")?.reset();
+              } catch (error) {
+                console.error("Apology error:", error);
+
+                alert("حدث خطأ أثناء إرسال الاعتذار. من فضلك حاول مرة أخرى.");
+              }
             }
 
-            // ----------------------------------------
-            // Calculate people in this request
-            // ----------------------------------------
-
-            const peopleCount = 1 + Number(companions || 0);
-
-            // ----------------------------------------
-            // Calculate total for Web3Forms
-            // ----------------------------------------
-
-            let totalGuests = currentTotalGuests;
-
-            if (action === "rsvp") {
-              totalGuests = currentTotalGuests + peopleCount;
+            function resetFormCounter() {
+              companions = 0;
+              compDisplay.innerText = "0";
+              compInput.value = "0";
+              btnMinus.disabled = true;
+              btnMinus.classList.add("cursor-not-allowed", "opacity-50");
             }
 
-            if (action === "apology") {
-              totalGuests = Math.max(0, currentTotalGuests - peopleCount);
+            // ----------------------------------------------------
+            // UPLOAD PHOTOS (footer) - GENERATES QR CODE
+            // ----------------------------------------------------
+            function openUploadModal() {
+              document.getElementById("upload-guest-name").value = "";
+              // Clear previous QR
+              document.getElementById("qr-code-container").innerHTML = "";
+              // document.getElementById("qr-folder-link").innerText = "";
+              showModal("upload-modal");
             }
 
-            console.log("Current TOTAL_GUESTS:", currentTotalGuests);
+            async function handleUploadPhotos() {
+              const input = document.getElementById("upload-guest-name");
 
-            console.log("New TOTAL_GUESTS:", totalGuests);
+              const qrContainer = document.getElementById("qr-code-container");
 
-            // ----------------------------------------
-            // Email subject
-            // ----------------------------------------
+              const guestName = input.value.trim();
 
-            const subject =
-              action === "rsvp"
-                ? "💍 تأكيد حضور - زفاف محمد وسارة"
-                : "💌 اعتذار عن حضور - زفاف محمد وسارة";
+              if (!guestName) {
+                alert("من فضلك أدخل اسمك.");
 
-            // ----------------------------------------
-            // Email message
-            // ----------------------------------------
+                input.focus();
 
-            const message =
-              action === "rsvp"
-                ? createFallbackRSVPMessage(guestName, companions, totalGuests)
-                : createFallbackApologyMessage(
-                    guestName,
-                    companions,
-                    totalGuests,
+                return;
+              }
+
+              // Clear old QR
+
+              qrContainer.innerHTML = "";
+
+              try {
+                console.log("Creating folder for:", guestName);
+
+                const response = await fetch(APPS_SCRIPT_URL, {
+                  method: "POST",
+
+                  headers: {
+                    "Content-Type": "text/plain;charset=utf-8",
+                  },
+
+                  body: JSON.stringify({
+                    action: "upload",
+
+                    guestName: guestName,
+                  }),
+                });
+
+                console.log("HTTP status:", response.status);
+
+                // ------------------------------------------
+                // Read response as TEXT first
+                // This prevents:
+                // Unexpected token '<'
+                // ------------------------------------------
+
+                const responseText = await response.text();
+
+                console.log("Apps Script response:", responseText);
+
+                let data;
+
+                try {
+                  data = JSON.parse(responseText);
+                } catch (jsonError) {
+                  console.error("Invalid JSON:", responseText);
+
+                  throw new Error("Apps Script returned something other than JSON.");
+                }
+
+                // ------------------------------------------
+                // Check success
+                // ------------------------------------------
+
+                if (!data.success) {
+                  throw new Error(data.error || "Could not create folder.");
+                }
+
+                if (!data.uploadUrl) {
+                  throw new Error(
+                    "Folder was created but no upload URL was returned.",
                   );
+                }
 
-            // ----------------------------------------
-            // Send Web3Forms
-            // ----------------------------------------
+                console.log("Folder URL:", data.uploadUrl);
 
-            await sendWeb3Forms(WEB3FORMS_KEY_1, subject, message);
+                // ------------------------------------------
+                // Generate QR
+                // ------------------------------------------
 
-            // ----------------------------------------
-            // Optional second email
-            // ----------------------------------------
+                new QRCode(qrContainer, {
+                  text: data.uploadUrl,
 
-            // await sendWeb3Forms(
-            //   WEB3FORMS_KEY_2,
-            //   subject,
-            //   message
-            // );
+                  width: 180,
 
-            return {
-              success: true,
+                  height: 180,
 
-              provider: "web3forms",
+                  colorDark: "#2e476d",
 
-              totalGuests: totalGuests,
-            };
-          } catch (web3Error) {
-            console.error("Web3Forms fallback failed:", web3Error);
+                  colorLight: "#ffffff",
 
-            return {
-              success: false,
+                  correctLevel: QRCode.CorrectLevel.H,
+                });
 
-              error: "Both email systems failed.",
-            };
-          }
-        }
-      }
-      async function sendWeb3Forms(accessKey, subject, message) {
-        const formData = new FormData();
+                // ------------------------------------------
+                // Optional success message
+                // ------------------------------------------
 
-        formData.append("access_key", accessKey);
+                const oldMessage = document.getElementById("qr-success-message");
 
-        formData.append("subject", subject);
+                if (oldMessage) {
+                  oldMessage.remove();
+                }
 
-        formData.append("from_name", "زفاف محمد وسارة");
+                const message = document.createElement("p");
 
-        formData.append("name", "Wedding RSVP");
+                message.id = "qr-success-message";
 
-        formData.append("message", message);
+                message.className =
+                  "font-cairo text-andalusia-darkgold text-xs mt-2 leading-relaxed";
 
-        const response = await fetch("https://api.web3forms.com/submit", {
-          method: "POST",
+                message.innerHTML =
+                  "تم إنشاء مجلدك بنجاح 💙<br>امسح رمز QR لرفع الصور.";
 
-          body: formData,
-        });
+                qrContainer.after(message);
+              } catch (error) {
+                console.error("Upload folder error:", error);
 
-        const result = await response.json();
-
-        console.log("Web3Forms:", result);
-
-        if (!result.success) {
-          throw new Error(result.message || "Web3Forms failed");
-        }
-
-        return result;
-      }
-      function createFallbackRSVPMessage(guestName, companions, totalGuests) {
-        const total = 1 + Number(companions || 0);
-
-        return `
-
-زفاف محمد وسارة
-
-تم تأكيد حضور ضيف جديد.
-
-الاسم:
-${guestName}
-
-عدد المرافقين:
-${companions}
-
-إجمالي الأشخاص في هذا الطلب:
-${total}
-
-إجمالي الحضور المسجل حتى الآن:
-${totalGuests}
-
-التاريخ:
-السبت، 10 أكتوبر 2026
-
-الوقت:
-3:00 مساءً — 6:00 مساءً
-
-المكان:
-القاعة الذهبية بدار المدرعات مدينة نصر
-
-نتطلع لرؤيتكم ومشاركتكم فرحتنا.
-
-محمد & سارة
-
-`;
-      }
-
-      function createFallbackApologyMessage(
-        guestName,
-        companions,
-        totalGuests,
-      ) {
-        const total = 1 + Number(companions || 0);
-
-        return `
-
-زفاف محمد وسارة
-
-تم تسجيل اعتذار ضيف عن حضور حفل الزفاف.
-
-الاسم:
-${guestName}
-
-عدد المرافقين:
-${companions}
-
-إجمالي الأشخاص في هذا الطلب:
-${total}
-
-إجمالي الحضور المسجل حتى الآن:
-${totalGuests}
-
-التاريخ:
-السبت، 10 أكتوبر 2026
-
-الوقت:
-3:00 مساءً — 6:00 مساءً
-
-المكان:
-القاعة الذهبية بدار المدرعات مدينة نصر
-
-نتمنى لكم دوام السعادة والمحبة.
-
-محمد & سارة
-
-`;
-      }
-      async function getTotalGuestsFromAppsScript() {
-        try {
-          const response = await fetch(APPS_SCRIPT_URL + "?action=counter");
-
-          const result = await response.json();
-
-          console.log("TOTAL_GUESTS from Apps Script:", result);
-
-          if (!result.success) {
-            throw new Error(result.error || "Could not get total guests");
-          }
-
-          return Number(result.totalGuests || 0);
-        } catch (error) {
-          console.error("Failed to get TOTAL_GUESTS:", error);
-
-          return 0;
-        }
-      }
-      async function submitRSVP(event) {
-        event.preventDefault();
-
-        const guestName = document.getElementById("guest-name").value.trim();
-
-        const companions = Number(
-          document.getElementById("companions-input").value || 0,
-        );
-
-        if (!guestName) {
-          alert("من فضلك أدخل اسمك.");
-
-          return;
-        }
-
-        const button = document.getElementById("btn-submit");
-
-        const buttonText = document.getElementById("btn-submit-text");
-
-        if (button) {
-          button.disabled = true;
-        }
-
-        if (buttonText) {
-          buttonText.textContent = "جاري تسجيل الحضور...";
-        }
-
-        try {
-          const result = await submitWeddingAction({
-            action: "rsvp",
-
-            guestName: guestName,
-
-            companions: companions,
-          });
-
-          if (!result.success) {
-            throw new Error(result.error);
-          }
-
-          console.log("RSVP sent using:", result.provider);
-
-          // Success UI
-
-          showModal("success-modal");
-
-          document.getElementById("rsvp-form")?.reset();
-        } catch (error) {
-          console.error("RSVP error:", error);
-
-          alert("حدث خطأ أثناء إرسال تأكيد الحضور. من فضلك حاول مرة أخرى.");
-        } finally {
-          if (button) {
-            button.disabled = false;
-          }
-
-          if (buttonText) {
-            buttonText.textContent = "سأحضر";
-          }
-        }
-      }
-      async function submitApology() {
-        const guestName = document.getElementById("guest-name").value.trim();
-
-        const companions = Number(
-          document.getElementById("companions-input").value || 0,
-        );
-
-        if (!guestName) {
-          alert("من فضلك أدخل اسمك أولاً.");
-
-          return;
-        }
-
-        try {
-          const result = await submitWeddingAction({
-            action: "apology",
-
-            guestName: guestName,
-
-            companions: companions,
-          });
-
-          if (!result.success) {
-            throw new Error(result.error);
-          }
-
-          console.log("Apology sent using:", result.provider);
-
-          showModal("apology-modal");
-
-          document.getElementById("rsvp-form")?.reset();
-        } catch (error) {
-          console.error("Apology error:", error);
-
-          alert("حدث خطأ أثناء إرسال الاعتذار. من فضلك حاول مرة أخرى.");
-        }
-      }
-
-      function resetFormCounter() {
-        companions = 0;
-        compDisplay.innerText = "0";
-        compInput.value = "0";
-        btnMinus.disabled = true;
-        btnMinus.classList.add("cursor-not-allowed", "opacity-50");
-      }
-
-      // ----------------------------------------------------
-      // UPLOAD PHOTOS (footer) - GENERATES QR CODE
-      // ----------------------------------------------------
-      function openUploadModal() {
-        document.getElementById("upload-guest-name").value = "";
-        // Clear previous QR
-        document.getElementById("qr-code-container").innerHTML = "";
-        // document.getElementById("qr-folder-link").innerText = "";
-        showModal("upload-modal");
-      }
-
-      async function handleUploadPhotos() {
-        const input = document.getElementById("upload-guest-name");
-
-        const qrContainer = document.getElementById("qr-code-container");
-
-        const guestName = input.value.trim();
-
-        if (!guestName) {
-          alert("من فضلك أدخل اسمك.");
-
-          input.focus();
-
-          return;
-        }
-
-        // Clear old QR
-
-        qrContainer.innerHTML = "";
-
-        try {
-          console.log("Creating folder for:", guestName);
-
-          const response = await fetch(APPS_SCRIPT_URL, {
-            method: "POST",
-
-            headers: {
-              "Content-Type": "text/plain;charset=utf-8",
-            },
-
-            body: JSON.stringify({
-              action: "upload",
-
-              guestName: guestName,
-            }),
-          });
-
-          console.log("HTTP status:", response.status);
-
-          // ------------------------------------------
-          // Read response as TEXT first
-          // This prevents:
-          // Unexpected token '<'
-          // ------------------------------------------
-
-          const responseText = await response.text();
-
-          console.log("Apps Script response:", responseText);
-
-          let data;
-
-          try {
-            data = JSON.parse(responseText);
-          } catch (jsonError) {
-            console.error("Invalid JSON:", responseText);
-
-            throw new Error("Apps Script returned something other than JSON.");
-          }
-
-          // ------------------------------------------
-          // Check success
-          // ------------------------------------------
-
-          if (!data.success) {
-            throw new Error(data.error || "Could not create folder.");
-          }
-
-          if (!data.uploadUrl) {
-            throw new Error(
-              "Folder was created but no upload URL was returned.",
-            );
-          }
-
-          console.log("Folder URL:", data.uploadUrl);
-
-          // ------------------------------------------
-          // Generate QR
-          // ------------------------------------------
-
-          new QRCode(qrContainer, {
-            text: data.uploadUrl,
-
-            width: 180,
-
-            height: 180,
-
-            colorDark: "#2e476d",
-
-            colorLight: "#ffffff",
-
-            correctLevel: QRCode.CorrectLevel.H,
-          });
-
-          // ------------------------------------------
-          // Optional success message
-          // ------------------------------------------
-
-          const oldMessage = document.getElementById("qr-success-message");
-
-          if (oldMessage) {
-            oldMessage.remove();
-          }
-
-          const message = document.createElement("p");
-
-          message.id = "qr-success-message";
-
-          message.className =
-            "font-cairo text-andalusia-darkgold text-xs mt-2 leading-relaxed";
-
-          message.innerHTML =
-            "تم إنشاء مجلدك بنجاح 💙<br>امسح رمز QR لرفع الصور.";
-
-          qrContainer.after(message);
-        } catch (error) {
-          console.error("Upload folder error:", error);
-
-          alert("حدث خطأ أثناء إنشاء المجلد.\n\n" + error.message);
-        }
-      }
-
-      // ----------------------------------------------------
-      // MODAL HELPERS
-      // ----------------------------------------------------
-      function showModal(id) {
-        const modal = document.getElementById(id);
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        setTimeout(() => modal.classList.add("opacity-100"), 10);
-      }
-      function closeModal(id) {
-        const modal = document.getElementById(id);
-        modal.classList.remove("opacity-100");
-        setTimeout(() => {
-          modal.classList.add("hidden");
-          modal.classList.remove("flex");
-        }, 300);
-      }
-
-      // close upload modal on outside click
-      document
-        .getElementById("upload-modal")
-        ?.addEventListener("click", function (e) {
-          if (e.target === this) closeModal("upload-modal");
-        });
-
-      // ----------------------------------------------------
-      // SCROLL REVEAL
-      // ----------------------------------------------------
-      document.addEventListener("DOMContentLoaded", () => {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-                observer.unobserve(entry.target);
+                alert("حدث خطأ أثناء إنشاء المجلد.\n\n" + error.message);
               }
+            }
+
+            // ----------------------------------------------------
+            // MODAL HELPERS
+            // ----------------------------------------------------
+            function showModal(id) {
+              const modal = document.getElementById(id);
+              modal.classList.remove("hidden");
+              modal.classList.add("flex");
+              setTimeout(() => modal.classList.add("opacity-100"), 10);
+            }
+            function closeModal(id) {
+              const modal = document.getElementById(id);
+              modal.classList.remove("opacity-100");
+              setTimeout(() => {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+              }, 300);
+            }
+
+            // close upload modal on outside click
+            document
+              .getElementById("upload-modal")
+              ?.addEventListener("click", function (e) {
+                if (e.target === this) closeModal("upload-modal");
+              });
+
+            // ----------------------------------------------------
+            // SCROLL REVEAL
+            // ----------------------------------------------------
+            document.addEventListener("DOMContentLoaded", () => {
+              const observer = new IntersectionObserver(
+                (entries) => {
+                  entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                      entry.target.classList.add("visible");
+                      observer.unobserve(entry.target);
+                    }
+                  });
+                },
+                { root: null, rootMargin: "0px", threshold: 0.12 },
+              );
+              document
+                .querySelectorAll(".scroll-reveal")
+                .forEach((el) => observer.observe(el));
             });
-          },
-          { root: null, rootMargin: "0px", threshold: 0.12 },
-        );
-        document
-          .querySelectorAll(".scroll-reveal")
-          .forEach((el) => observer.observe(el));
-      });
     </script>
   </body>
 </html>
