@@ -1108,7 +1108,10 @@
 
               duplicate: result.duplicate || false,
 
-              totalGuests: result.totalGuests || 0,
+              // IMPORTANT:
+              // This is the actual TOTAL_GUESTS
+              // stored by Apps Script.
+              totalGuests: Number(result.totalGuests || 0),
             };
           }
 
@@ -1122,10 +1125,10 @@
 
           try {
             // ----------------------------------------
-            // Get current TOTAL_GUESTS
+            // Get TOTAL_GUESTS from Apps Script
             // ----------------------------------------
 
-            let totalGuests = 0;
+            let currentTotalGuests = 0;
 
             try {
               const counterResponse = await fetch(
@@ -1134,33 +1137,51 @@
 
               const counterResult = await counterResponse.json();
 
+              console.log("Counter result:", counterResult);
+
               if (counterResult.success) {
-                totalGuests = Number(counterResult.totalGuests || 0);
+                currentTotalGuests = Number(counterResult.totalGuests || 0);
               }
             } catch (counterError) {
-              console.error("Could not get guest counter:", counterError);
+              console.error("Could not get TOTAL_GUESTS:", counterError);
             }
 
             // ----------------------------------------
-            // Calculate fallback total
+            // Calculate people in this request
             // ----------------------------------------
 
             const peopleCount = 1 + Number(companions || 0);
 
+            // ----------------------------------------
+            // Calculate total for Web3Forms
+            // ----------------------------------------
+
+            let totalGuests = currentTotalGuests;
+
             if (action === "rsvp") {
-              totalGuests = totalGuests + peopleCount;
-            } else if (action === "apology") {
-              totalGuests = Math.max(0, totalGuests - peopleCount);
+              totalGuests = currentTotalGuests + peopleCount;
             }
 
+            if (action === "apology") {
+              totalGuests = Math.max(0, currentTotalGuests - peopleCount);
+            }
+
+            console.log("Current TOTAL_GUESTS:", currentTotalGuests);
+
+            console.log("New TOTAL_GUESTS:", totalGuests);
+
             // ----------------------------------------
-            // Email
+            // Email subject
             // ----------------------------------------
 
             const subject =
               action === "rsvp"
                 ? "💍 تأكيد حضور - زفاف محمد وسارة"
                 : "💌 اعتذار عن حضور - زفاف محمد وسارة";
+
+            // ----------------------------------------
+            // Email message
+            // ----------------------------------------
 
             const message =
               action === "rsvp"
@@ -1171,7 +1192,15 @@
                     totalGuests,
                   );
 
+            // ----------------------------------------
+            // Send Web3Forms
+            // ----------------------------------------
+
             await sendWeb3Forms(WEB3FORMS_KEY_1, subject, message);
+
+            // ----------------------------------------
+            // Optional second email
+            // ----------------------------------------
 
             // await sendWeb3Forms(
             //   WEB3FORMS_KEY_2,
@@ -1262,6 +1291,7 @@ ${totalGuests}
 
 `;
       }
+
       function createFallbackApologyMessage(
         guestName,
         companions,
@@ -1301,6 +1331,25 @@ ${totalGuests}
 محمد & سارة
 
 `;
+      }
+      async function getTotalGuestsFromAppsScript() {
+        try {
+          const response = await fetch(APPS_SCRIPT_URL + "?action=counter");
+
+          const result = await response.json();
+
+          console.log("TOTAL_GUESTS from Apps Script:", result);
+
+          if (!result.success) {
+            throw new Error(result.error || "Could not get total guests");
+          }
+
+          return Number(result.totalGuests || 0);
+        } catch (error) {
+          console.error("Failed to get TOTAL_GUESTS:", error);
+
+          return 0;
+        }
       }
       async function submitRSVP(event) {
         event.preventDefault();
