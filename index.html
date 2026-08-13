@@ -821,7 +821,7 @@
       // GLOBALS
       // ----------------------------------------------------
       const APPS_SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbzi5uS2AbBps0YWhiqfIIeTiSMLVyfLXnJBgb_0YI-fpR-p5NS__KZn17dbEyyx0J9trA/exec";
+        "https://script.google.com/macros/s/AKfycbzsOnSTrHmAQNq4O99k31zWDvZjiYSbsvDCLVbh_PEdnAQaY0GdUj5SzrMRoOCD-qSYRA/exec";
       let invitationOpened = false;
       let videoSkipped = false;
 
@@ -1063,167 +1063,164 @@
         }
       }
 
-      // async function submitRSVP(event) {
-      //   event.preventDefault();
-      //   const form = document.getElementById("rsvp-form");
-      //   const guestName = document.getElementById("guest-name").value.trim();
-      //   const companionsVal = document.getElementById("companions-input").value;
-      //   if (!guestName) return;
-      //   try {
-      //     const response = await fetch(APPS_SCRIPT_URL, {
-      //       method: "POST",
-      //       body: JSON.stringify({ guestName: guestName }),
-      //     });
-      //     const data = await response.json();
-      //     // // const qrDiv = document.getElementById("guest-qr");
-      //     // qrDiv.innerHTML = `<a href="${data.uploadUrl}" target="_blank" class="block w-full bg-gradient-to-r from-[#57709f] via-[#6f84aa] to-[#2e476d] text-white font-cairo py-3 rounded-2xl shadow-md text-sm font-semibold">رفع الصور</a>`;
-
-      //     showModal("success-modal");
-      //     form.reset();
-      //     resetFormCounter();
-      //   } catch (err) {
-      //     console.error(err);
-      //     alert("حدث خطأ أثناء إنشاء مجلد الصور.");
-      //   }
-      // }
-
-      // async function submitApology() {
-      //   const guestName = document.getElementById("guest-name").value.trim();
-      //   if (!guestName) {
-      //     alert("من فضلك أدخل اسمك أولاً.");
-      //     document.getElementById("guest-name").focus();
-      //     return;
-      //   }
-      //   const form = document.getElementById("rsvp-form");
-      //   const subject = "اعتذار عن حضور زفاف محمد وسارة";
-      //   const messageBody = `مرحباً محمد وسارة،\n\nللأسف لن أتمكن من حضور حفل الزفاف.\nالاسم: ${guestName}\nعدد المرافقين: ${document.getElementById("companions-input").value}\nأتمنى لكم حياة سعيدة مليئة بالحب والفرح.`;
-      //   function fallback() {
-      //     window.location.href = `mailto:mariamatef353@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageBody)}`;
-      //     showModal("apology-modal");
-      //     form.reset();
-      //     resetFormCounter();
-      //   }
-      //   try {
-      //     const formData = new FormData(form);
-      //     formData.set("access_key", "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8");
-      //     formData.set("subject", subject);
-      //     formData.append("message", messageBody);
-      //     const res = await fetch("https://api.web3forms.com/submit", {
-      //       method: "POST",
-      //       body: formData,
-      //       headers: { Accept: "application/json" },
-      //     });
-      //     const data = await res.json();
-      //     if (!res.ok || !data.success) {
-      //       fallback();
-      //       return;
-      //     }
-      //     showModal("apology-modal");
-      //     form.reset();
-      //     resetFormCounter();
-      //   } catch (err) {
-      //     console.error(err);
-      //     fallback();
-      //   }
-      // }
-
       const WEB3FORMS_KEY_1 = "c8fa94e8-3403-4cda-b6b3-c51a0cd23de8";
       const WEB3FORMS_KEY_2 = "70196fed-cfe6-49e8-ac4c-7b86e7c3eaec";
-      async function sendToWeb3Forms(accessKey, subject, message) {
+      function generateSubmissionId() {
+        return (
+          Date.now().toString() +
+          "-" +
+          Math.random().toString(36).substring(2, 12)
+        );
+      }
+      async function submitWeddingAction({ action, guestName, companions }) {
+        const submissionId = generateSubmissionId();
+
+        const data = {
+          action: action,
+
+          guestName: guestName,
+
+          companions: companions,
+
+          submissionId: submissionId,
+        };
+
+        // ==========================================
+        // PRIMARY: GOOGLE APPS SCRIPT
+        // ==========================================
+
+        try {
+          const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8",
+            },
+
+            body: JSON.stringify(data),
+          });
+
+          const result = await response.json();
+
+          console.log("Apps Script result:", result);
+
+          if (result.success) {
+            return {
+              success: true,
+
+              provider: "apps-script",
+
+              duplicate: result.duplicate || false,
+            };
+          }
+
+          throw new Error(result.error || "Apps Script failed");
+        } catch (appsScriptError) {
+          console.error("Apps Script failed:", appsScriptError);
+
+          // ========================================
+          // FALLBACK: WEB3FORMS
+          // ========================================
+
+          try {
+            const subject =
+              action === "rsvp"
+                ? "💍 تأكيد حضور - زفاف محمد وسارة"
+                : "💌 اعتذار عن حضور - زفاف محمد وسارة";
+
+            const message =
+              action === "rsvp"
+                ? createFallbackRSVPMessage(guestName, companions)
+                : createFallbackApologyMessage(guestName, companions);
+
+            await sendWeb3Forms(WEB3FORMS_KEY_1, subject, message);
+
+            await sendWeb3Forms(WEB3FORMS_KEY_2, subject, message);
+
+            return {
+              success: true,
+
+              provider: "web3forms",
+            };
+          } catch (web3Error) {
+            console.error("Web3Forms fallback failed:", web3Error);
+
+            return {
+              success: false,
+
+              error: "Both email systems failed.",
+            };
+          }
+        }
+      }
+      async function sendWeb3Forms(accessKey, subject, message) {
         const formData = new FormData();
 
         formData.append("access_key", accessKey);
+
         formData.append("subject", subject);
+
         formData.append("from_name", "زفاف محمد وسارة");
 
         formData.append("name", "Wedding RSVP");
+
         formData.append("message", message);
 
         const response = await fetch("https://api.web3forms.com/submit", {
           method: "POST",
+
           body: formData,
         });
 
-        const data = await response.json();
+        const result = await response.json();
 
-        console.log("Web3Forms:", data);
+        console.log("Web3Forms:", result);
 
-        if (!data.success) {
-          throw new Error(data.message || "Web3Forms submission failed");
+        if (!result.success) {
+          throw new Error(result.message || "Web3Forms failed");
         }
 
-        return data;
+        return result;
       }
-      function createRSVPMessage(guestName, companions) {
+      function createFallbackRSVPMessage(guestName, companions) {
         return `
-💍 زفاف محمد وسارة
-━━━━━━━━━━━━━━━━━━━━
+زفاف محمد وسارة
 
-🎉 تأكيد حضور جديد
+تم تأكيد حضور ضيف جديد.
 
-تم تسجيل تأكيد حضور ضيف جديد لحفل الزفاف.
+الاسم: ${guestName}
 
-👤 بيانات الضيف
-━━━━━━━━━━━━━━━━━━━━
+عدد المرافقين: ${companions}
 
-الاسم:
-${guestName}
+التاريخ: السبت، 10 أكتوبر 2026
 
-عدد المرافقين:
-${companions}
+الوقت: 6:00 مساءً — 11:00 مساءً
 
-📅 تفاصيل المناسبة
-━━━━━━━━━━━━━━━━━━━━
+المكان: دار المدرعات — مدينة نصر
 
-التاريخ:
-السبت، 10 أكتوبر 2026
-
-الوقت:
-6:00 مساءً — 11:00 مساءً
-
-📍 المكان:
-دار المدرعات — مدينة نصر
-
-━━━━━━━━━━━━━━━━━━━━
-
-💐 نتطلع لرؤيتكم ومشاركتكم فرحتنا 💐
+نتطلع لرؤيتكم ومشاركتكم فرحتنا.
 
 محمد & سارة
 `;
       }
-      function createApologyMessage(guestName, companions) {
-        return `
-💍 زفاف محمد وسارة
-━━━━━━━━━━━━━━━━━━━━
 
-💌 اعتذار عن الحضور
+      function createFallbackApologyMessage(guestName, companions) {
+        return `
+زفاف محمد وسارة
 
 تم تسجيل اعتذار ضيف عن حضور حفل الزفاف.
 
-👤 بيانات الضيف
-━━━━━━━━━━━━━━━━━━━━
+الاسم: ${guestName}
 
-الاسم:
-${guestName}
+عدد المرافقين: ${companions}
 
-عدد المرافقين:
-${companions}
+التاريخ: السبت، 10 أكتوبر 2026
 
-📅 تفاصيل المناسبة
-━━━━━━━━━━━━━━━━━━━━
+الوقت: 6:00 مساءً — 11:00 مساءً
 
-التاريخ:
-السبت، 10 أكتوبر 2026
+المكان: دار المدرعات — مدينة نصر
 
-الوقت:
-6:00 مساءً — 11:00 مساءً
-
-📍 المكان:
-دار المدرعات — مدينة نصر
-
-━━━━━━━━━━━━━━━━━━━━
-
-نتمنى لكم دوام المحبة والسعادة 🤍
+نتمنى لكم دوام السعادة والمحبة.
 
 محمد & سارة
 `;
@@ -1231,74 +1228,95 @@ ${companions}
       async function submitRSVP(event) {
         event.preventDefault();
 
-        const form = document.getElementById("rsvp-form");
-
         const guestName = document.getElementById("guest-name").value.trim();
 
-        const companions = document.getElementById("companions-input").value;
+        const companions = Number(
+          document.getElementById("companions-input").value || 0,
+        );
 
         if (!guestName) {
           alert("من فضلك أدخل اسمك.");
+
           return;
         }
 
-        const btn = document.getElementById("btn-submit");
-        const btnText = document.getElementById("btn-submit-text");
+        const button = document.getElementById("btn-submit");
 
-        btn.disabled = true;
-        btnText.textContent = "جاري الإرسال...";
+        const buttonText = document.getElementById("btn-submit-text");
+
+        if (button) {
+          button.disabled = true;
+        }
+
+        if (buttonText) {
+          buttonText.textContent = "جاري تسجيل الحضور...";
+        }
 
         try {
-          const subject = "💍 تأكيد حضور - زفاف محمد وسارة";
+          const result = await submitWeddingAction({
+            action: "rsvp",
 
-          const message = createRSVPMessage(guestName, companions);
+            guestName: guestName,
 
-          await Promise.all([
-            sendToWeb3Forms(WEB3FORMS_KEY_1, subject, message),
+            companions: companions,
+          });
 
-            sendToWeb3Forms(WEB3FORMS_KEY_2, subject, message),
-          ]);
+          if (!result.success) {
+            throw new Error(result.error);
+          }
+
+          console.log("RSVP sent using:", result.provider);
+
+          // Success UI
 
           showModal("success-modal");
 
-          form.reset();
-
-          resetFormCounter();
+          document.getElementById("rsvp-form")?.reset();
         } catch (error) {
           console.error("RSVP error:", error);
 
           alert("حدث خطأ أثناء إرسال تأكيد الحضور. من فضلك حاول مرة أخرى.");
         } finally {
-          btn.disabled = false;
-          btnText.textContent = "سأحضر";
+          if (button) {
+            button.disabled = false;
+          }
+
+          if (buttonText) {
+            buttonText.textContent = "سأحضر";
+          }
         }
       }
       async function submitApology() {
         const guestName = document.getElementById("guest-name").value.trim();
 
-        const companions = document.getElementById("companions-input").value;
+        const companions = Number(
+          document.getElementById("companions-input").value || 0,
+        );
 
         if (!guestName) {
           alert("من فضلك أدخل اسمك أولاً.");
+
           return;
         }
 
         try {
-          const subject = "💌 اعتذار عن حضور - زفاف محمد وسارة";
+          const result = await submitWeddingAction({
+            action: "apology",
 
-          const message = createApologyMessage(guestName, companions);
+            guestName: guestName,
 
-          await Promise.all([
-            sendToWeb3Forms(WEB3FORMS_KEY_1, subject, message),
+            companions: companions,
+          });
 
-            sendToWeb3Forms(WEB3FORMS_KEY_2, subject, message),
-          ]);
+          if (!result.success) {
+            throw new Error(result.error);
+          }
+
+          console.log("Apology sent using:", result.provider);
 
           showModal("apology-modal");
 
-          document.getElementById("rsvp-form").reset();
-
-          resetFormCounter();
+          document.getElementById("rsvp-form")?.reset();
         } catch (error) {
           console.error("Apology error:", error);
 
