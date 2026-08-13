@@ -821,7 +821,7 @@
       // GLOBALS
       // ----------------------------------------------------
       const APPS_SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbxQ2KQOobsgogz8Y3SZUDJ3-OE0wOdyhuLqdSJB-rC4Br-MH2HogrGYRZw75GPhG3ojwg/exec";
+        "https://script.google.com/macros/s/AKfycbyyXdaCL-53cmW5YkZGD4qyAMF-Erg3UYIJ8cjUsqpjKD5NTrbkHSjCcaxbQ81U9Xu4Lw/exec";
       let invitationOpened = false;
       let videoSkipped = false;
 
@@ -1345,41 +1345,71 @@
         const guestName = document
           .getElementById("upload-guest-name")
           .value.trim();
+
         if (!guestName) {
           alert("من فضلك أدخل اسمك.");
           return;
         }
+
+        const qrContainer = document.getElementById("qr-code-container");
+
+        qrContainer.innerHTML = "";
+
         try {
+          const formData = new URLSearchParams();
+
+          formData.append("action", "upload");
+          formData.append("guestName", guestName);
+          formData.append("submissionId", generateSubmissionId());
+
           const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
-            body: JSON.stringify({ guestName: guestName }),
+            body: formData,
           });
-          const data = await response.json();
-          if (data.uploadUrl) {
-            // Generate QR code inside the modal
-            const qrContainer = document.getElementById("qr-code-container");
-            qrContainer.innerHTML = ""; // clear previous
-            // Use QRCode.js to generate QR
-            new QRCode(qrContainer, {
-              text: data.uploadUrl,
-              width: 140,
-              height: 140,
-              colorDark: "#2e476d",
-              colorLight: "#ffffff",
-              correctLevel: QRCode.CorrectLevel.H,
-            });
-            // Show link text
-            // document.getElementById("qr-folder-link").innerText =
-            //   "📁 رابط المجلد: " + data.uploadUrl;
-          } else {
-            alert("تم إنشاء المجلد ولكن حدث خطأ في الرابط.");
+
+          const text = await response.text();
+
+          console.log("Apps Script raw response:", text);
+
+          let data;
+
+          try {
+            data = JSON.parse(text);
+          } catch (parseError) {
+            console.error("Apps Script returned non-JSON:", text);
+
+            throw new Error("Google Apps Script returned an invalid response.");
           }
-        } catch (err) {
-          console.error(err);
-          alert("حدث خطأ أثناء إنشاء المجلد. تأكد من اتصال الإنترنت.");
+
+          console.log("Apps Script upload response:", data);
+
+          if (!data.success) {
+            throw new Error(data.error || "Failed to create folder.");
+          }
+
+          if (!data.uploadUrl) {
+            throw new Error(
+              "Folder was created but no upload URL was returned.",
+            );
+          }
+
+          // Generate QR
+          new QRCode(qrContainer, {
+            text: data.uploadUrl,
+            width: 180,
+            height: 180,
+            colorDark: "#2e476d",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H,
+          });
+
+          console.log("Folder created:", data.uploadUrl);
+        } catch (error) {
+          console.error("Upload folder error:", error);
+
+          alert("حدث خطأ أثناء إنشاء مجلد الصور. من فضلك حاول مرة أخرى.");
         }
       }
-
       // ----------------------------------------------------
       // MODAL HELPERS
       // ----------------------------------------------------
