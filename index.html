@@ -1087,27 +1087,27 @@
         // ==========================================
 
         try {
-          //   const response = await fetch(APPS_SCRIPT_URL, {
-          //     method: "POST",
-          //     headers: {
-          //       "Content-Type": "text/plain;charset=utf-8",
-          //     },
-          //     body: JSON.stringify(data),
-          //   });
-          //   const result = await response.json();
-          //   console.log("Apps Script result:", result);
-          //   if (result.success) {
-          //     return {
-          //       success: true,
-          //       provider: "apps-script",
-          //       duplicate: result.duplicate || false,
-          //       // IMPORTANT:
-          //       // This is the actual TOTAL_GUESTS
-          //       // stored by Apps Script.
-          //       totalGuests: Number(result.totalGuests || 0),
-          //     };
-          //   }
-          //   throw new Error(result.error || "Apps Script failed");
+          const response = await fetch(APPS_SCRIPT_URLs, {
+            method: "POST",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8",
+            },
+            body: JSON.stringify(data),
+          });
+          const result = await response.json();
+          console.log("Apps Script result:", result);
+          if (result.success) {
+            return {
+              success: true,
+              provider: "apps-script",
+              duplicate: result.duplicate || false,
+              // IMPORTANT:
+              // This is the actual TOTAL_GUESTS
+              // stored by Apps Script.
+              totalGuests: Number(result.totalGuests || 0),
+            };
+          }
+          throw new Error(result.error || "Apps Script failed");
         } catch (appsScriptError) {
           console.error("Apps Script failed:", appsScriptError);
 
